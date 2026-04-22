@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Button, Card, Spinner, Alert } from 'flowbite-svelte';
 	import { RefreshCw } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
 
 	interface Movie {
 		id: number;
@@ -14,6 +15,7 @@
 		poster_url: string;
 		synopsis: string;
 		rating: string;
+		slug: string;
 	}
 
 	let movies: Movie[] = $state([]);
@@ -54,13 +56,17 @@
 		}
 	}
 
+	function openMovie(slug: string) {
+		goto(`/movies/${slug}`);
+	}
+
 	onMount(fetchMovies);
 </script>
 
 <div class="container mx-auto p-4">
 	<div class="flex justify-between items-center mb-8">
 		<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Video Club Argento</h1>
-		<Button color="blue" onclick={syncDatabase} disabled={syncing}>
+		<Button color="dark" onclick={syncDatabase} disabled={syncing}>
 			{#if syncing}
 				<Spinner class="mr-2" size="4" />
 				Syncing...
@@ -94,7 +100,11 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 			{#each movies as movie}
-				<Card padding="none" class="overflow-hidden">
+				<button
+					onclick={() => openMovie(movie.slug)}
+					class="block w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
+				>
+				<Card>
 					<div class="aspect-[2/3] bg-gray-200 dark:bg-gray-700 overflow-hidden">
 						{#if movie.poster_url}
 							<img
@@ -124,6 +134,7 @@
 									href={movie.watch_link}
 									target="_blank"
 									rel="noopener noreferrer"
+									onclick={(e) => e.stopPropagation()}
 									class="text-blue-600 hover:underline text-sm font-medium"
 								>
 									Watch Now
@@ -132,6 +143,7 @@
 						</div>
 					</div>
 				</Card>
+				</button>
 			{/each}
 		</div>
 	{/if}
