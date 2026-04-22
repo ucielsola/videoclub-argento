@@ -41,7 +41,7 @@ def read_root():
 
 
 @app.get("/movies", response_model=List[MovieListItem])
-def get_movies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_movies(skip: int = 0, limit: int = 10000, db: Session = Depends(get_db)):
     movies = (
         db.query(Movie)
         .options(
@@ -55,6 +55,7 @@ def get_movies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
                 Movie.director,
                 Movie.rating,
                 Movie.watch_link,
+                Movie.enrichment_status,
             )
         )
         .offset(skip)
