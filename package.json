@@ -1,0 +1,15 @@
+{
+  "name": "videoclub-argento",
+  "private": true,
+  "packageManager": "npm@10.2.3",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}

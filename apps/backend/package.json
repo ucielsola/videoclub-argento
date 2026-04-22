@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "uv run fastapi dev main.py",
+    "export-openapi": "uv run python export_openapi.py",
+    "build": "echo 'No build step for backend'"
+  }
+}
