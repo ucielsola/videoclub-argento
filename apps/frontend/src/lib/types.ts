@@ -15,6 +15,7 @@ export interface MovieListItem {
 	director?: string;
 	rating?: number;
 	watch_link?: string;
+	enrichment_status?: EnrichmentStatus;
 }
 
 export interface MovieBase {
