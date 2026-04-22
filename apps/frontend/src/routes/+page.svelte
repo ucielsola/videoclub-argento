@@ -3,22 +3,9 @@
 	import { Button, Card, Spinner, Alert } from 'flowbite-svelte';
 	import { RefreshCw } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import type { MovieListItem } from '$lib/types';
 
-	interface Movie {
-		id: number;
-		title: string;
-		director: string;
-		year: number;
-		official_media: string;
-		watch_link: string;
-		tmdb_id: number;
-		poster_url: string;
-		synopsis: string;
-		rating: string;
-		slug: string;
-	}
-
-	let movies: Movie[] = $state([]);
+	let movies: MovieListItem[] = $state([]);
 	let loading = $state(true);
 	let syncing = $state(false);
 	let error = $state('');
@@ -56,7 +43,8 @@
 		}
 	}
 
-	function openMovie(slug: string) {
+	function openMovie(slug: string | undefined) {
+		if (!slug) return;
 		goto(`/movies/${slug}`);
 	}
 
