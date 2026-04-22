@@ -33,3 +33,5 @@ venv.bak/
 .env.*
 !.env.example
 !.env.test
+
+data

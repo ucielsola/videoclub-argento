@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from database import EnrichmentStatus
 
 
 class MovieBase(BaseModel):
@@ -10,20 +11,26 @@ class MovieBase(BaseModel):
     official_media: Optional[str] = None
     watch_link: Optional[str] = None
 
-    # TMDB Data
     tmdb_id: Optional[int] = None
     original_title: Optional[str] = None
     poster_url: Optional[str] = None
     backdrop_url: Optional[str] = None
-    synopsis: Optional[str] = None
+    tmdb_synopsis: Optional[str] = None
     rating: Optional[float] = None
     vote_count: Optional[int] = None
     runtime: Optional[int] = None
     genres: Optional[str] = None
 
-    # Search & URL helpers
+    imdb_rating: Optional[float] = None
+    imdb_votes: Optional[int] = None
+
+    wiki_summary: Optional[str] = None
+    wikipedia_url: Optional[str] = None
+
     search_title: Optional[str] = None
     slug: Optional[str] = None
+
+    enrichment_status: Optional[EnrichmentStatus] = None
 
 
 class MovieListItem(BaseModel):
@@ -33,6 +40,9 @@ class MovieListItem(BaseModel):
     poster_url: Optional[str] = None
     search_title: Optional[str] = None
     slug: Optional[str] = None
+    director: Optional[str] = None
+    rating: Optional[float] = None
+    watch_link: Optional[str] = None
 
     class Config:
         from_attributes = True

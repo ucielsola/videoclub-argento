@@ -1,10 +1,11 @@
+import asyncio
 import csv
 import httpx
 import io
 import logging
 from sqlalchemy.orm import Session
 from database import Movie
-from utils import normalize_for_search, generate_slug
+from utils import normalize_for_search, get_unique_slug
 
 # Configure logging
 logging.basicConfig(
@@ -17,9 +18,10 @@ TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
 TMDB_DETAILS_URL = "https://api.themoviedb.org/3/movie/"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 TMDB_BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280"
+OMDB_URL = "https://www.omdbapi.com/"
 
 
-async def sync_movies(db: Session, tmdb_api_key: str):
+async def sync_movies(db: Session, tmdb_api_key: str, omdb_api_key: str = ""):
     logger.info("Starting sync process...")
     async with httpx.AsyncClient(follow_redirects=True) as client:
         # 1. Download CSV
@@ -90,7 +92,9 @@ async def sync_movies(db: Session, tmdb_api_key: str):
                 continue
 
             tmdb_data = None
+            omdb_data = None
 
+            # Primary: TMDB search
             if tmdb_api_key:
                 params = {
                     "query": item["title"],
@@ -119,6 +123,38 @@ async def sync_movies(db: Session, tmdb_api_key: str):
                 except Exception as e:
                     logger.error(f"  Error fetching TMDB data for {item['title']}: {e}")
 
+            # Concurrency delay to avoid rate limiting
+            await asyncio.sleep(0.2)
+
+            # Fallback/Enrichment: OMDb if TMDB failed or missing critical fields
+            needs_omdb = (
+                not tmdb_data
+                or not tmdb_data.get("overview")
+                or not tmdb_data.get("runtime")
+            )
+
+            if omdb_api_key and needs_omdb:
+                omdb_params = {
+                    "apikey": omdb_api_key,
+                    "t": item["title"],
+                }
+                if item["year"]:
+                    omdb_params["y"] = item["year"]
+
+                try:
+                    omdb_res = await client.get(OMDB_URL, params=omdb_params)
+                    omdb_res.raise_for_status()
+                    omdb_result = omdb_res.json()
+
+                    if omdb_result.get("Response") == "True":
+                        omdb_data = omdb_result
+                        logger.info(f"  Enriched with OMDb: {item['title']}")
+                except Exception as e:
+                    logger.error(f"  Error fetching OMDb data for {item['title']}: {e}")
+
+            # Concurrency delay after OMDb
+            await asyncio.sleep(0.2)
+
             new_movie = Movie(
                 title=item["title"],
                 director=item["director"],
@@ -126,16 +162,16 @@ async def sync_movies(db: Session, tmdb_api_key: str):
                 official_media=item["official_media"],
                 watch_link=item["watch_link"],
                 search_title=normalize_for_search(item["title"]),
-                slug=generate_slug(item["title"], item["year"]),
+                slug=get_unique_slug(db, item["title"], item["year"]),
             )
 
+            # Apply TMDB data
             if tmdb_data:
                 new_movie.tmdb_id = tmdb_data.get("id")
                 new_movie.original_title = tmdb_data.get("original_title")
-                new_movie.synopsis = tmdb_data.get("overview")
-                new_movie.rating = tmdb_data.get("vote_average")
-                new_movie.vote_count = tmdb_data.get("vote_count")
-                new_movie.runtime = tmdb_data.get("runtime")
+
+                if not new_movie.tmdb_synopsis and tmdb_data.get("overview"):
+                    new_movie.tmdb_synopsis = tmdb_data.get("overview")
 
                 if tmdb_data.get("poster_path"):
                     new_movie.poster_url = (
@@ -149,6 +185,24 @@ async def sync_movies(db: Session, tmdb_api_key: str):
                     new_movie.genres = ", ".join(
                         [g["name"] for g in tmdb_data.get("genres")]
                     )
+
+            # Apply OMDb data (ratings and missing fields)
+            if omdb_data:
+                if omdb_data.get("imdbRating") and omdb_data.get("imdbRating") != "N/A":
+                    new_movie.rating = float(omdb_data.get("imdbRating"))
+                if omdb_data.get("imdbVotes") and omdb_data.get("imdbVotes") != "N/A":
+                    new_movie.vote_count = int(
+                        omdb_data.get("imdbVotes").replace(",", "")
+                    )
+                if omdb_data.get("Runtime") and omdb_data.get("Runtime") != "N/A":
+                    runtime_str = omdb_data.get("Runtime").split()[0]
+                    try:
+                        new_movie.runtime = int(runtime_str)
+                    except ValueError:
+                        pass
+
+                if not new_movie.tmdb_synopsis and omdb_data.get("Plot") != "N/A":
+                    new_movie.tmdb_synopsis = omdb_data.get("Plot")
 
             db.add(new_movie)
             try:
