@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://videouser:videopassword@localhost:5432/videoclub"
     TMDB_API_KEY: str = ""
+    OMDB_API_KEY: str = ""
 
     class Config:
         env_file = ".env"
@@ -64,5 +65,4 @@ def get_db():
 
 
 def init_db():
-    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
