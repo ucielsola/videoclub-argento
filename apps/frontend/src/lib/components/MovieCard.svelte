@@ -26,7 +26,7 @@
 		{/if}
 	</div>
 
-	<div class="p-3 shrink-0 bg-white dark:bg-gray-800">
+	<div class="p-3 shrink-0">
 		<h5 class="text-sm font-bold tracking-tight text-gray-900 dark:text-white line-clamp-1">
 			{movie.title}
 		</h5>

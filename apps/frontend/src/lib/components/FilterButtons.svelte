@@ -12,10 +12,10 @@
 				movies.setFilter(v as 'all' | 'director' | 'year');
 			}
 		}}
-		ctxBtnClass="border-gray-300 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-600 first:rounded-l-full last:rounded-r-full"
+		ctxBtnClass="border border-gray-300 dark:border-gray-600 first:rounded-l-full last:rounded-r-full"
 	>
 		<ButtonToggle value="all">Todo</ButtonToggle>
-		<ButtonToggle value="title">Titulo</ButtonToggle>
+		<ButtonToggle value="title">Título</ButtonToggle>
 		<ButtonToggle value="director">Director</ButtonToggle>
 		<ButtonToggle value="year">Año</ButtonToggle>
 	</ButtonToggleGroup>
