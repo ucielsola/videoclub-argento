@@ -17,7 +17,7 @@
 		overscan?: number;
 	}
 
-	let { itemHeight = 280, overscan = 3 }: Props = $props();
+	let { itemHeight = 280, overscan = 24 }: Props = $props();
 
 	let gridOpacity = $state(1);
 	let gridTranslateY = $state(0);
