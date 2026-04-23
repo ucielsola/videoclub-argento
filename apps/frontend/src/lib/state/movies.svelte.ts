@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import type { MovieListItem } from '$lib/types';
+import type { MovieListItem, SortMode } from '$lib/types';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -13,6 +13,7 @@ class MoviesStore {
 	#syncMessage = $state<string | null>(null);
 	#searchQuery = $state('');
 	#activeFilter = $state<FilterMode>('all');
+	#sortBy = $state<SortMode>('title');
 
 	constructor() {
 		this.loadMovies();
@@ -29,6 +30,9 @@ class MoviesStore {
 	get activeFilter(): FilterMode { return this.#activeFilter; }
 	set activeFilter(v: FilterMode) { this.#activeFilter = v; }
 
+	get sortBy(): SortMode { return this.#sortBy; }
+	set sortBy(v: SortMode) { this.#sortBy = v; }
+
 	get #fuseInstance(): Fuse<MovieListItem> {
 		return new Fuse(this.#list, {
 			keys: [
@@ -42,31 +46,42 @@ class MoviesStore {
 	}
 
 	get filteredList(): MovieListItem[] {
-		if (!this.#searchQuery.trim()) return this.#list;
+		let results: MovieListItem[];
 
-		const results = this.#fuseInstance.search(this.#searchQuery);
+		if (!this.#searchQuery.trim()) {
+			results = [...this.#list];
+		} else {
+			const fuseResults = this.#fuseInstance.search(this.#searchQuery);
 
-		if (this.#activeFilter === 'title') {
-			return results
-				.filter(r => r.item.title?.toLowerCase().includes(this.#searchQuery.toLowerCase()))
-				.map(r => r.item);
+			if (this.#activeFilter === 'title') {
+				results = fuseResults
+					.filter(r => r.item.title?.toLowerCase().includes(this.#searchQuery.toLowerCase()))
+					.map(r => r.item);
+			} else if (this.#activeFilter === 'director') {
+				results = fuseResults
+					.filter(r => r.item.director?.toLowerCase().includes(this.#searchQuery.toLowerCase()))
+					.map(r => r.item);
+			} else if (this.#activeFilter === 'year') {
+				const year = parseInt(this.#searchQuery);
+				if (isNaN(year)) {
+					results = fuseResults.map(r => r.item);
+				} else {
+					results = fuseResults
+						.filter(r => r.item.year === year || r.item.year?.toString().includes(this.#searchQuery))
+						.map(r => r.item);
+				}
+			} else {
+				results = fuseResults.map(r => r.item);
+			}
 		}
 
-		if (this.#activeFilter === 'director') {
-			return results
-				.filter(r => r.item.director?.toLowerCase().includes(this.#searchQuery.toLowerCase()))
-				.map(r => r.item);
+		if (this.#sortBy === 'title') {
+			results.sort((a, b) => a.title.localeCompare(b.title));
+		} else {
+			results.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 		}
 
-		if (this.#activeFilter === 'year') {
-			const year = parseInt(this.#searchQuery);
-			if (isNaN(year)) return results.map(r => r.item);
-			return results
-				.filter(r => r.item.year === year || r.item.year?.toString().includes(this.#searchQuery))
-				.map(r => r.item);
-		}
-
-		return results.map(r => r.item);
+		return results;
 	}
 
 	get directors(): string[] {
