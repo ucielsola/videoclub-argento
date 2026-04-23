@@ -1,9 +1,9 @@
-import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session, load_only
 from typing import List
-from database import engine, get_db, init_db, Movie, settings
+from sqlalchemy import func as sa_func
+from database import get_db, init_db, Movie, settings
 from schemas import MovieResponse, MovieListItem
 from etl import sync_movies
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,6 +60,30 @@ def get_movies(skip: int = 0, limit: int = 10000, db: Session = Depends(get_db))
         )
         .offset(skip)
         .limit(limit)
+        .all()
+    )
+    return movies
+
+
+@app.get("/movies/director/{director}", response_model=List[MovieListItem])
+def get_movies_by_director(director: str, db: Session = Depends(get_db)):
+    movies = (
+        db.query(Movie)
+        .options(
+            load_only(
+                Movie.id,
+                Movie.title,
+                Movie.year,
+                Movie.poster_url,
+                Movie.search_title,
+                Movie.slug,
+                Movie.director,
+                Movie.rating,
+                Movie.watch_link,
+                Movie.enrichment_status,
+            )
+        )
+        .filter(sa_func.lower(Movie.director) == director.lower())
         .all()
     )
     return movies
