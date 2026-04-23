@@ -3,11 +3,29 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".svelte-kit/**", "dist/**"]
+      "outputs": ["dist/**", ".output/**", "build/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "check": {
+      "dependsOn": ["^build"]
+    },
+    "check:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "export-openapi": {
+      "cache": true,
+      "outputs": ["openapi.json"]
+    },
+    "generate-client": {
+      "dependsOn": ["backend#export-openapi"],
+      "outputs": ["src/lib/api/**"]
     }
   }
 }
