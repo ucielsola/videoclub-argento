@@ -31,7 +31,14 @@
 			{movie.title}
 		</h5>
 		<p class="text-xs text-gray-600 dark:text-gray-400">
-			{movie.year || 'N/A'} • {movie.director || 'Unknown'}
+			{movie.year || 'N/A'} •
+			{#if movie.director}
+				<a href="/directors/{encodeURIComponent(movie.director)}" class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors" onclick={(e) => e.stopPropagation()}>
+					{movie.director}
+				</a>
+			{:else}
+				Unknown
+			{/if}
 		</p>
 	</div>
 </Card>
