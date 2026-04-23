@@ -9,24 +9,20 @@
 
 	let { title = 'Video Club Argento', children, actionsSlot }: Props = $props();
 
-	let scrolled = $state(false);
+	let scrollY = $state(0);
+	let scrolled = $derived(scrollY > 30);
 
-	$effect(() => {
-		const onScroll = () => {
-			scrolled = window.scrollY > 50;
-		};
-		onScroll();
-		window.addEventListener('scroll', onScroll, { passive: true });
-		return () => window.removeEventListener('scroll', onScroll);
-	});
+	$inspect(scrolled)
 </script>
 
+<svelte:window bind:scrollY={scrollY}></svelte:window>
+
 <div
-	class="sticky top-0 relative transition-all duration-300 {scrolled
+	class="sticky top-0 transition-all duration-300 {scrolled
 		? 'z-50 shadow-lg shadow-black/5 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-lg'
 		: ''}"
 >
-	<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300 {scrolled ? 'h-0.5 opacity-60' : ''}"></div>
+	<div class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300 {scrolled ? 'h-0.5 opacity-60' : ''}"></div>
 
 	<div
 		class="container mx-auto px-4 relative transition-all duration-300 ease-in-out {scrolled
