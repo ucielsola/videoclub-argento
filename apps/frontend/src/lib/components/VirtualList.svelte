@@ -1,40 +1,62 @@
-<script lang="ts">
+<script lang="ts" generics="T">
 	import type { Snippet } from 'svelte';
 
 	interface Props {
-		items: unknown[];
+		items: T[];
 		itemHeight: number;
-		columns?: number;
+		minColWidth?: number;
+		gap?: number;
 		overscan?: number;
-		row: Snippet<[{ item: unknown; index: number }]>;
+		contained?: boolean;
+		row: Snippet<[{ item: T; index: number }]>;
 		children?: Snippet;
 	}
 
-	let { items, itemHeight, columns = 6, overscan = 3, row, children }: Props = $props();
+	let {
+		items,
+		itemHeight,
+		minColWidth = 340,
+		gap = 8,
+		overscan = 3,
+		contained = true, // Defaulting to true because it's a huge performance win
+		row,
+		children
+	}: Props = $props();
 
 	let scrollTop = $state(0);
 	let containerHeight = $state(0);
-	let containerRef: HTMLDivElement | undefined = $state();
 	let containerWidth = $state(0);
+	let containerRef: HTMLDivElement | undefined = $state();
+
+	const columnsCount = $derived(
+		Math.max(1, Math.floor(containerWidth / minColWidth))
+	);
+
+	const rowHeight = $derived(itemHeight + gap);
+	const totalRows = $derived(Math.ceil(items.length / columnsCount));
+	const totalHeight = $derived(totalRows * rowHeight);
+
+	export function scrollToIndex(index: number, behavior: ScrollBehavior = 'auto') {
+		if (!containerRef || index < 0 || index >= items.length) return;
+
+		// Calculate which row this index lives on
+		const rowIndex = Math.floor(index / columnsCount);
+		// Calculate exactly where that row sits vertically
+		const targetScrollTop = rowIndex * rowHeight;
+
+		containerRef.scrollTo({ top: targetScrollTop, behavior });
+	}
 
 	export function scrollTo(options?: ScrollToOptions) {
 		containerRef?.scrollTo(options);
 	}
-
-	const columnsCount = $derived(
-		Math.floor(containerWidth / 180) || columns
-	);
-
-	const rowHeight = $derived(itemHeight + 8);
-	const totalRows = $derived(Math.ceil(items.length / columnsCount));
-	const totalHeight = $derived(totalRows * rowHeight);
 
 	const startRow = $derived(Math.max(0, Math.floor(scrollTop / rowHeight) - overscan));
 	const visibleRows = $derived(Math.ceil(containerHeight / rowHeight) + overscan * 2);
 	const endRow = $derived(Math.min(totalRows, startRow + visibleRows));
 
 	const visibleItems = $derived.by(() => {
-		const result: { item: unknown; index: number }[] = [];
+		const result: { item: T; index: number }[] = [];
 		for (let rowIdx = startRow; rowIdx < endRow; rowIdx++) {
 			const startIdx = rowIdx * columnsCount;
 			const endIdx = Math.min(startIdx + columnsCount, items.length);
@@ -50,62 +72,34 @@
 	function handleScroll(e: Event) {
 		scrollTop = (e.currentTarget as HTMLElement).scrollTop;
 	}
-
-	function handleResize(e: Event) {
-		containerWidth = (e.currentTarget as HTMLElement).clientWidth;
-	}
 </script>
 
 <div
-	class="virtual-list-container"
 	bind:this={containerRef}
 	bind:clientHeight={containerHeight}
 	bind:clientWidth={containerWidth}
 	onscroll={handleScroll}
-	onresize={handleResize}
 	role="list"
-	aria-label="Virtual list"
+	aria-label="Virtual grid"
+	class="relative h-full overflow-y-auto [-webkit-overflow-scrolling:touch]"
 >
-	<div class="virtual-list-ghost" style="height: {totalHeight}px;">
-		<div class="virtual-list-window" style="transform: translateY({offsetY}px);">
-			<div class="virtual-list-grid" style="--cols: {columnsCount}">
+	<div class="relative w-full" style="height: {totalHeight}px;">
+		<div class="absolute left-0 top-0 w-full" style="transform: translateY({offsetY}px);">
+			<div
+				class="grid"
+				style="grid-template-columns: repeat({columnsCount}, minmax(0, 1fr)); gap: {gap}px;"
+			>
 				{#each visibleItems as { item, index } (index)}
-					<div class="virtual-list-item">
+					<div
+						class="w-full {contained ? 'contain-[layout_style_paint]' : ''}"
+						style="height: {itemHeight}px;"
+					>
 						{@render row({ item, index })}
 					</div>
 				{/each}
 			</div>
 		</div>
 	</div>
+
+	{@render children?.()}
 </div>
-
-<style>
-	.virtual-list-container {
-		height: 100%;
-		overflow-y: auto;
-		position: relative;
-		-webkit-overflow-scrolling: touch;
-	}
-
-	.virtual-list-ghost {
-		position: relative;
-		width: 100%;
-	}
-
-	.virtual-list-window {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-	}
-
-	.virtual-list-grid {
-		display: grid;
-		grid-template-columns: repeat(var(--cols, 6), 1fr);
-		gap: 8px;
-	}
-
-	.virtual-list-item {
-		width: 100%;
-	}
-</style>

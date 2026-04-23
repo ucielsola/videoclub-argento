@@ -17,3 +17,47 @@ A modern SvelteKit web interface for browsing and managing the movie collection.
 ```bash
 npm run dev
 ```
+
+## 🏗️ Store Pattern (Svelte 5 Runes)
+
+Use class-based stores with private `$state` fields and public getters:
+
+```typescript
+class MoviesStore {
+  #loading = $state<boolean>(false);
+  #error = $state<string | null>(null);
+  #list = $state<Movie[]>([]);
+
+  constructor() {
+    this.loadMovies();
+  }
+
+  public async loadMovies(): Promise<void> {
+    this.#loading = true;
+    try {
+      this.#list = await api.getMovies();
+    } catch (e) {
+      this.#error = "Failed to load movies";
+    } finally {
+      this.#loading = false;
+    }
+  }
+
+  get loading(): boolean { return this.#loading; }
+  get error(): string | null { return this.#error; }
+  get list(): Movie[] { return this.#list; }
+}
+
+export const movies = new MoviesStore();
+```
+
+Then use in Svelte components:
+```svelte
+{#if movies.loading}
+  <Spinner />
+{:else}
+  {#each movies.list as movie}
+    <MovieCard {movie} />
+  {/each}
+{/if}
+```

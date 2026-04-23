@@ -33,7 +33,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="md:col-span-1">
-                <div class="aspect-[2/3] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg">
+                <div class="aspect-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg">
                     {#if movie.poster_url}
                         <img
                             src={movie.poster_url}
