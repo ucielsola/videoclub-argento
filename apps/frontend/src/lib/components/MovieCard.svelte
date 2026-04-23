@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { Film } from 'lucide-svelte';
-	import { Card } from 'flowbite-svelte';
-	import type { MovieListItem } from '$lib/types';
+import { Card } from "flowbite-svelte";
+import { Film } from "lucide-svelte";
+import type { MovieListItem } from "$lib/types";
 
-	interface Props {
-		movie: MovieListItem;
-	}
+interface Props {
+	movie: MovieListItem;
+}
 
-	let { movie }: Props = $props();
+let { movie }: Props = $props();
 </script>
 
 <Card hoverable class="p-0 overflow-hidden h-full flex flex-col" href={`/movies/${movie.slug}`}>

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Button, Spinner } from 'flowbite-svelte';
-	import { RefreshCw } from 'lucide-svelte';
-	import { movies } from '$lib/state';
+import { Button, Spinner } from "flowbite-svelte";
+import { RefreshCw } from "lucide-svelte";
+import { movies } from "$lib/state";
 </script>
 
 <Button

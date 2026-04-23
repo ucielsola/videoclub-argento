@@ -1,7 +1,8 @@
 <script>
-  import "../app.css";
-  import ScrollToTop from "$lib/components/ScrollToTop.svelte";
-  let { children } = $props();
+import "../app.css";
+import ScrollToTop from "$lib/components/ScrollToTop.svelte";
+
+let { children } = $props();
 </script>
 
 <div class="bg-white dark:bg-gray-900 relative min-h-dvh">

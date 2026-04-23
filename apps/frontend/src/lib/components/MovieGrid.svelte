@@ -1,43 +1,43 @@
 <script lang="ts">
-	import type { MovieListItem, SortMode } from '$lib/types';
-	import VirtualList from './VirtualList.svelte';
-	import MovieCard from './MovieCard.svelte';
-	import { Alert, Badge } from 'flowbite-svelte';
-	import { ArrowUpNarrowWide, ArrowDownNarrowWide } from 'lucide-svelte';
-	import { movies } from '$lib/state';
+import { Alert, Badge } from "flowbite-svelte";
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-svelte";
+import { movies } from "$lib/state";
+import type { MovieListItem, SortMode } from "$lib/types";
+import MovieCard from "./MovieCard.svelte";
+import VirtualList from "./VirtualList.svelte";
 
-	let virtualList: ReturnType<typeof VirtualList> | undefined = $state();
+let virtualList: ReturnType<typeof VirtualList> | undefined = $state();
 
-	export function scrollToIndex(index: number, behavior?: ScrollBehavior) {
-		virtualList?.scrollToIndex(index, behavior);
+export function scrollToIndex(index: number, behavior?: ScrollBehavior) {
+	virtualList?.scrollToIndex(index, behavior);
+}
+
+interface Props {
+	itemHeight?: number;
+	overscan?: number;
+}
+
+let { itemHeight = 280, overscan = 24 }: Props = $props();
+
+let gridOpacity = $state(1);
+let gridTranslateY = $state(0);
+let timeout: ReturnType<typeof setTimeout> | undefined;
+
+function setSort(mode: SortMode) {
+	if (mode === movies.sortBy) {
+		movies.sortDirection = movies.sortDirection === "asc" ? "desc" : "asc";
+		return;
 	}
-
-	interface Props {
-		itemHeight?: number;
-		overscan?: number;
-	}
-
-	let { itemHeight = 280, overscan = 24 }: Props = $props();
-
-	let gridOpacity = $state(1);
-	let gridTranslateY = $state(0);
-	let timeout: ReturnType<typeof setTimeout> | undefined;
-
-	function setSort(mode: SortMode) {
-		if (mode === movies.sortBy) {
-			movies.sortDirection = movies.sortDirection === 'asc' ? 'desc' : 'asc';
-			return;
-		}
-		gridOpacity = 0;
-		gridTranslateY = 8;
-		clearTimeout(timeout);
-		timeout = setTimeout(() => {
-			movies.sortBy = mode;
-			movies.sortDirection = 'asc';
-			gridOpacity = 1;
-			gridTranslateY = 0;
-		}, 200);
-	}
+	gridOpacity = 0;
+	gridTranslateY = 8;
+	clearTimeout(timeout);
+	timeout = setTimeout(() => {
+		movies.sortBy = mode;
+		movies.sortDirection = "asc";
+		gridOpacity = 1;
+		gridTranslateY = 0;
+	}, 200);
+}
 </script>
 
 <div class="flex items-center gap-3 mb-4">

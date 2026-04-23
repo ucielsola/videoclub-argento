@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { Search, X } from 'lucide-svelte';
-	import { movies } from '$lib/state';
+import { Search, X } from "lucide-svelte";
+import { movies } from "$lib/state";
 
-	let inputValue = $state('');
-	let debounceTimer: ReturnType<typeof setTimeout> | undefined = $state();
+let inputValue = $state("");
+let debounceTimer: ReturnType<typeof setTimeout> | undefined = $state();
 
-	function handleInput(e: Event) {
-		const value = (e.target as HTMLInputElement).value;
-		inputValue = value;
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			movies.setSearchQuery(value);
-		}, 500);
-	}
+function handleInput(e: Event) {
+	const value = (e.target as HTMLInputElement).value;
+	inputValue = value;
+	clearTimeout(debounceTimer);
+	debounceTimer = setTimeout(() => {
+		movies.setSearchQuery(value);
+	}, 500);
+}
 
-	function handleClear() {
-		inputValue = '';
-		clearTimeout(debounceTimer);
-		movies.setSearchQuery('');
-	}
+function handleClear() {
+	inputValue = "";
+	clearTimeout(debounceTimer);
+	movies.setSearchQuery("");
+}
 </script>
 
 <div class="relative">

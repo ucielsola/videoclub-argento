@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { Button, Spinner, Badge } from 'flowbite-svelte';
-    import { ArrowLeft, ExternalLink, Play } from 'lucide-svelte';
+import { Badge, Button, Spinner } from "flowbite-svelte";
+import { ArrowLeft, ExternalLink, Play } from "lucide-svelte";
 
-    interface Props {
-        data: { movie: any };
-    }
+interface Props {
+	data: { movie: any };
+}
 
-    let { data }: Props = $props();
-    let movie = $derived(data.movie);
+let { data }: Props = $props();
+let movie = $derived(data.movie);
 </script>
 
 <svelte:head>

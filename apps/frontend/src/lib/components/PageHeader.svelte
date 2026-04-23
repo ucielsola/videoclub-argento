@@ -1,26 +1,26 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import { theme } from '$lib/state';
+import type { Snippet } from "svelte";
+import { theme } from "$lib/state";
 
-	interface Props {
-		title?: string;
-		children: Snippet;
-		actionsSlot?: Snippet;
-	}
+interface Props {
+	title?: string;
+	children: Snippet;
+	actionsSlot?: Snippet;
+}
 
-	let { title = 'Video Club Argento', children, actionsSlot }: Props = $props();
+let { title = "Video Club Argento", children, actionsSlot }: Props = $props();
 
-	let scrolled = $state(false);
-	let rafId = 0;
+let scrolled = $state(false);
+let rafId = 0;
 
-	function handleScroll() {
-		cancelAnimationFrame(rafId);
-		rafId = requestAnimationFrame(() => {
-			const y = window.scrollY;
-			if (!scrolled && y > 20) scrolled = true;
-			else if (scrolled && y < 5) scrolled = false;
-		});
-	}
+function handleScroll() {
+	cancelAnimationFrame(rafId);
+	rafId = requestAnimationFrame(() => {
+		const y = window.scrollY;
+		if (!scrolled && y > 20) scrolled = true;
+		else if (scrolled && y < 5) scrolled = false;
+	});
+}
 </script>
 
 <svelte:window onscroll={handleScroll}></svelte:window>

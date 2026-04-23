@@ -10,9 +10,13 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write ."
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.4.13",
 		"@hey-api/openapi-ts": "^0.95.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/kit": "^2.57.0",
@@ -20,14 +24,15 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.4",
 		"flowbite": "^4.0.1",
-		"flowbite-svelte": "^2.0.0-next.10",
-		"flowbite-svelte-icons": "^2.0.0-next.3",
+		"flowbite-svelte": "2.0.0-next.10",
+		"flowbite-svelte-icons": "2.0.0-next.3",
 		"lucide-svelte": "^1.0.1",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.2.4",
 		"typescript": "^6.0.2",
-		"vite": "^8.0.7"
+		"vite": "^8.0.7",
+		"vite-plugin-inspector": "^1.0.4"
 	},
 	"dependencies": {
 		"fuse.js": "^7.3.0"

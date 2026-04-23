@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Alert } from 'flowbite-svelte';
-	import { movies } from '$lib/state';
+import { Alert } from "flowbite-svelte";
+import { movies } from "$lib/state";
 </script>
 
 {#if movies.error}

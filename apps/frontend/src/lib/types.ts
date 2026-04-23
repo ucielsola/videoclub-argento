@@ -1,11 +1,11 @@
-export type SortMode = 'title' | 'year';
-export type SortDirection = 'asc' | 'desc';
+export type SortMode = "title" | "year";
+export type SortDirection = "asc" | "desc";
 
 export enum EnrichmentStatus {
-	Pending = 'PENDING',
-	Processing = 'PROCESSING',
-	Complete = 'COMPLETE',
-	Failed = 'FAILED',
+	Pending = "PENDING",
+	Processing = "PROCESSING",
+	Complete = "COMPLETE",
+	Failed = "FAILED",
 }
 
 export interface MovieListItem {

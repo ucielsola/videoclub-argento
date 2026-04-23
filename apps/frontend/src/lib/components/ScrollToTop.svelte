@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { ArrowUp } from 'lucide-svelte';
+import { ArrowUp } from "lucide-svelte";
 
-	let visible = $state(false);
+let visible = $state(false);
 
-	function onScroll() {
-		visible = window.scrollY > 400;
-	}
+function onScroll() {
+	visible = window.scrollY > 400;
+}
 
-	function scrollToTop() {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
+function scrollToTop() {
+	window.scrollTo({ top: 0, behavior: "smooth" });
+}
 </script>
 
 <svelte:window onscroll={onScroll} />

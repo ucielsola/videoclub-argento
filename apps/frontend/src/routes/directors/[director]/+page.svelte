@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { ArrowLeft } from 'lucide-svelte';
-    import MovieCard from '$lib/components/MovieCard.svelte';
-    import type { MovieListItem } from '$lib/types';
+import { ArrowLeft } from "lucide-svelte";
+import MovieCard from "$lib/components/MovieCard.svelte";
+import type { MovieListItem } from "$lib/types";
 
-    interface Props {
-        data: { director: string; movies: MovieListItem[] };
-    }
+interface Props {
+	data: { director: string; movies: MovieListItem[] };
+}
 
-    let { data }: Props = $props();
+let { data }: Props = $props();
 </script>
 
 <svelte:head>
