@@ -3,7 +3,7 @@ import type { MovieListItem } from '$lib/types';
 
 const API_BASE = 'http://localhost:8000';
 
-export type FilterMode = 'all' | 'director' | 'year';
+export type FilterMode = 'all' | 'title' | 'director' | 'year';
 
 class MoviesStore {
 	#list = $state<MovieListItem[]>([]);
@@ -45,6 +45,12 @@ class MoviesStore {
 		if (!this.#searchQuery.trim()) return this.#list;
 
 		const results = this.#fuseInstance.search(this.#searchQuery);
+
+		if (this.#activeFilter === 'title') {
+			return results
+				.filter(r => r.item.title?.toLowerCase().includes(this.#searchQuery.toLowerCase()))
+				.map(r => r.item);
+		}
 
 		if (this.#activeFilter === 'director') {
 			return results
