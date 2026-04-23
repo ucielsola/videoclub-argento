@@ -1,16 +1,17 @@
 import asyncio
+import contextlib
 import csv
-import httpx
 import io
 import logging
+
+import httpx
 from sqlalchemy.orm import Session
+
 from database import Movie
-from utils import normalize_for_search, get_unique_slug
+from utils import get_unique_slug, normalize_for_search
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 CSV_URL = "https://docs.google.com/spreadsheets/d/158Jjw_BMEcVgqeVwjGFwLtbnQm2EPg20P2Z5SDUBW_c/export?format=csv&gid=0"
@@ -42,9 +43,7 @@ async def sync_movies(db: Session, tmdb_api_key: str, omdb_api_key: str = ""):
         # 3. Delta Sync: Get existing movies
         logger.info("Checking existing movies in database...")
         existing_movies = db.query(Movie).all()
-        existing_set = {
-            f"{m.title}_{m.director}_{m.year}".lower().strip() for m in existing_movies
-        }
+        existing_set = {f"{m.title}_{m.director}_{m.year}".lower().strip() for m in existing_movies}
 
         movies_to_process = []
         for row in reader:
@@ -77,18 +76,12 @@ async def sync_movies(db: Session, tmdb_api_key: str, omdb_api_key: str = ""):
         # 4. Enrich with TMDB and insert
         count = 0
         for i, item in enumerate(movies_to_process):
-            logger.info(
-                f"[{i + 1}/{len(movies_to_process)}] Processing: {item['title']}"
-            )
+            logger.info(f"[{i + 1}/{len(movies_to_process)}] Processing: {item['title']}")
 
             # Check for duplicate in DB
-            existing = (
-                db.query(Movie).filter(Movie.watch_link == item["watch_link"]).first()
-            )
+            existing = db.query(Movie).filter(Movie.watch_link == item["watch_link"]).first()
             if existing:
-                logger.info(
-                    f"  Skipping: {item['title']} (already in DB via watch_link)"
-                )
+                logger.info(f"  Skipping: {item['title']} (already in DB via watch_link)")
                 continue
 
             tmdb_data = None
@@ -127,11 +120,7 @@ async def sync_movies(db: Session, tmdb_api_key: str, omdb_api_key: str = ""):
             await asyncio.sleep(0.2)
 
             # Fallback/Enrichment: OMDb if TMDB failed or missing critical fields
-            needs_omdb = (
-                not tmdb_data
-                or not tmdb_data.get("overview")
-                or not tmdb_data.get("runtime")
-            )
+            needs_omdb = not tmdb_data or not tmdb_data.get("overview") or not tmdb_data.get("runtime")
 
             if omdb_api_key and needs_omdb:
                 omdb_params = {
@@ -174,32 +163,22 @@ async def sync_movies(db: Session, tmdb_api_key: str, omdb_api_key: str = ""):
                     new_movie.tmdb_synopsis = tmdb_data.get("overview")
 
                 if tmdb_data.get("poster_path"):
-                    new_movie.poster_url = (
-                        f"{TMDB_IMAGE_BASE}{tmdb_data.get('poster_path')}"
-                    )
+                    new_movie.poster_url = f"{TMDB_IMAGE_BASE}{tmdb_data.get('poster_path')}"
                 if tmdb_data.get("backdrop_path"):
-                    new_movie.backdrop_url = (
-                        f"{TMDB_BACKDROP_BASE}{tmdb_data.get('backdrop_path')}"
-                    )
+                    new_movie.backdrop_url = f"{TMDB_BACKDROP_BASE}{tmdb_data.get('backdrop_path')}"
                 if tmdb_data.get("genres"):
-                    new_movie.genres = ", ".join(
-                        [g["name"] for g in tmdb_data.get("genres")]
-                    )
+                    new_movie.genres = ", ".join([g["name"] for g in tmdb_data.get("genres")])
 
             # Apply OMDb data (ratings and missing fields)
             if omdb_data:
                 if omdb_data.get("imdbRating") and omdb_data.get("imdbRating") != "N/A":
                     new_movie.rating = float(omdb_data.get("imdbRating"))
                 if omdb_data.get("imdbVotes") and omdb_data.get("imdbVotes") != "N/A":
-                    new_movie.vote_count = int(
-                        omdb_data.get("imdbVotes").replace(",", "")
-                    )
+                    new_movie.vote_count = int(omdb_data.get("imdbVotes").replace(",", ""))
                 if omdb_data.get("Runtime") and omdb_data.get("Runtime") != "N/A":
                     runtime_str = omdb_data.get("Runtime").split()[0]
-                    try:
+                    with contextlib.suppress(ValueError):
                         new_movie.runtime = int(runtime_str)
-                    except ValueError:
-                        pass
 
                 if not new_movie.tmdb_synopsis and omdb_data.get("Plot") != "N/A":
                     new_movie.tmdb_synopsis = omdb_data.get("Plot")

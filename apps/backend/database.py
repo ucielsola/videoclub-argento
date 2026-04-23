@@ -1,23 +1,24 @@
-import os
-from enum import Enum
+from enum import StrEnum
+
+from pydantic_settings import BaseSettings
 from sqlalchemy import (
-    create_engine,
     Column,
+    DateTime,
+    Float,
     Integer,
     String,
     Text,
-    Float,
-    DateTime,
+    create_engine,
+)
+from sqlalchemy import (
     Enum as SQLEnum,
 )
-from sqlalchemy.orm import sessionmaker, load_only
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
-from pydantic_settings import BaseSettings
 
 
-class EnrichmentStatus(str, Enum):
+class EnrichmentStatus(StrEnum):
     PENDING = "PENDING"
     PROCESSING = "PROCESSING"
     COMPLETE = "COMPLETE"
@@ -29,7 +30,9 @@ class Settings(BaseSettings):
     TMDB_API_KEY: str = ""
     OMDB_API_KEY: str = ""
 
-    CSV_URL: str = "https://docs.google.com/spreadsheets/d/158Jjw_BMEcVgqeVwjGFwLtbnQm2EPg20P2Z5SDUBW_c/export?format=csv&gid=0"
+    CSV_URL: str = (
+        "https://docs.google.com/spreadsheets/d/158Jjw_BMEcVgqeVwjGFwLtbnQm2EPg20P2Z5SDUBW_c/export?format=csv&gid=0"
+    )
     TMDB_SEARCH_URL: str = "https://api.themoviedb.org/3/search/movie"
     TMDB_DETAILS_URL: str = "https://api.themoviedb.org/3/movie/"
     TMDB_IMAGE_BASE: str = "https://image.tmdb.org/t/p/w500"
@@ -89,9 +92,7 @@ class Movie(Base):
     slug = Column(String, index=True)
 
     # Self-Healing
-    enrichment_status = Column(
-        SQLEnum(EnrichmentStatus), default=EnrichmentStatus.PENDING, index=True
-    )
+    enrichment_status = Column(SQLEnum(EnrichmentStatus), default=EnrichmentStatus.PENDING, index=True)
 
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())

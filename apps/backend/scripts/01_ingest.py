@@ -7,22 +7,20 @@ and saves raw JSON to local cache.
 
 import asyncio
 import csv
-import httpx
 import io
 import json
 import logging
-import os
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import httpx
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from database import settings
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "raw"
@@ -59,13 +57,11 @@ def save_cache(source: str, slug: str, data: dict):
 
 
 def generate_slug(title: str, year: int | None) -> str:
-    import unicodedata
     import re
+    import unicodedata
 
     normalized = unicodedata.normalize("NFD", title)
-    cleaned = "".join(
-        c for c in normalized if not unicodedata.category(c).startswith("M")
-    )
+    cleaned = "".join(c for c in normalized if not unicodedata.category(c).startswith("M"))
     cleaned = cleaned.lower()
     cleaned = re.sub(r"[^a-z0-9\s]", "", cleaned)
     cleaned = re.sub(r"\s+", "-", cleaned).strip("-")
@@ -97,9 +93,7 @@ async def fetch_csv() -> list[dict]:
             continue
 
         try:
-            year = (
-                int(row.get("Año", "").strip()) if row.get("Año", "").strip() else None
-            )
+            year = int(row.get("Año", "").strip()) if row.get("Año", "").strip() else None
         except ValueError:
             year = None
 
@@ -115,16 +109,12 @@ async def fetch_csv() -> list[dict]:
             }
         )
 
-    save_cache(
-        "sheets", slug, {"fetched_at": datetime.now().isoformat(), "movies": movies}
-    )
+    save_cache("sheets", slug, {"fetched_at": datetime.now().isoformat(), "movies": movies})
     logger.info(f"Fetched {len(movies)} movies from CSV")
     return movies
 
 
-async def fetch_tmdb(
-    client: httpx.AsyncClient, title: str, year: int | None, slug: str
-) -> dict | None:
+async def fetch_tmdb(client: httpx.AsyncClient, title: str, year: int | None, slug: str) -> dict | None:
     cached = load_cached("tmdb", slug)
     if cached:
         return cached
@@ -213,9 +203,7 @@ async def fetch_omdb(
         return None
 
 
-async def fetch_wikipedia(
-    client: httpx.AsyncClient, title: str, year: int | None, slug: str
-) -> dict | None:
+async def fetch_wikipedia(client: httpx.AsyncClient, title: str, year: int | None, slug: str) -> dict | None:
     cached = load_cached("wikipedia", slug)
     if cached:
         return cached

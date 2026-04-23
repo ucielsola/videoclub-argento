@@ -7,17 +7,14 @@ using on_conflict_do_update on the slug field.
 
 import json
 import logging
-import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from database import Movie, SessionLocal, settings, EnrichmentStatus
+from database import EnrichmentStatus, Movie, SessionLocal, settings
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 PROCESSED_DIR = Path(__file__).parent.parent / "data" / "processed"
@@ -34,7 +31,6 @@ def load_processed_movies() -> list[dict]:
 
 def create_upsert_stmt(movie_dict: dict):
     from sqlalchemy.dialects.postgresql import insert
-    from sqlalchemy import insert as sql_insert
 
     stmt = insert(Movie).values(**movie_dict)
     stmt = stmt.on_conflict_do_update(
@@ -101,7 +97,7 @@ def main():
 
     db = SessionLocal()
     try:
-        inserted, updated = batch_upsert(movies, db)
+        inserted, _updated = batch_upsert(movies, db)
         logger.info(f"Load complete! {inserted} records upserted.")
     finally:
         db.close()

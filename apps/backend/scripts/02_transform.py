@@ -7,20 +7,15 @@ and saves processed data to data/processed/.
 
 import json
 import logging
-import os
+import re
 import sys
 import unicodedata
-import re
 from pathlib import Path
-from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from database import settings
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 RAW_DIR = Path(__file__).parent.parent / "data" / "raw"
@@ -36,9 +31,7 @@ def ensure_dirs():
 
 def normalize_for_search(text: str) -> str:
     normalized = unicodedata.normalize("NFD", text)
-    cleaned = "".join(
-        c for c in normalized if not unicodedata.category(c).startswith("M")
-    )
+    cleaned = "".join(c for c in normalized if not unicodedata.category(c).startswith("M"))
     cleaned = cleaned.lower()
     cleaned = re.sub(r"[^a-z0-9\s]", "", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
@@ -99,9 +92,7 @@ def transform_movie(raw_movie: dict) -> dict:
             {
                 "tmdb_id": tmdb.get("id"),
                 "original_title": tmdb.get("original_title"),
-                "poster_url": f"{TMDB_IMAGE_BASE}{tmdb.get('poster_path')}"
-                if tmdb.get("poster_path")
-                else None,
+                "poster_url": f"{TMDB_IMAGE_BASE}{tmdb.get('poster_path')}" if tmdb.get("poster_path") else None,
                 "backdrop_url": f"{TMDB_BACKDROP_BASE}{tmdb.get('backdrop_path')}"
                 if tmdb.get("backdrop_path")
                 else None,
@@ -109,9 +100,7 @@ def transform_movie(raw_movie: dict) -> dict:
                 "rating": tmdb.get("vote_average"),
                 "vote_count": tmdb.get("vote_count"),
                 "runtime": tmdb.get("runtime"),
-                "genres": ", ".join([g["name"] for g in tmdb.get("genres", [])])
-                if tmdb.get("genres")
-                else None,
+                "genres": ", ".join([g["name"] for g in tmdb.get("genres", [])]) if tmdb.get("genres") else None,
             }
         )
 
@@ -120,12 +109,8 @@ def transform_movie(raw_movie: dict) -> dict:
         imdb_votes = omdb.get("imdbVotes")
         transformed.update(
             {
-                "imdb_rating": float(imdb_rating)
-                if imdb_rating and imdb_rating != "N/A"
-                else None,
-                "imdb_votes": int(imdb_votes.replace(",", ""))
-                if imdb_votes and imdb_votes != "N/A"
-                else None,
+                "imdb_rating": float(imdb_rating) if imdb_rating and imdb_rating != "N/A" else None,
+                "imdb_votes": int(imdb_votes.replace(",", "")) if imdb_votes and imdb_votes != "N/A" else None,
             }
         )
         if not transformed.get("tmdb_synopsis") and omdb.get("Plot") != "N/A":
@@ -142,9 +127,7 @@ def transform_movie(raw_movie: dict) -> dict:
     return transformed
 
 
-def handle_slug_collision(
-    processed_movies: list[dict], slug: str, base_slug: str
-) -> str:
+def handle_slug_collision(processed_movies: list[dict], slug: str, base_slug: str) -> str:
     existing_slugs = {m["slug"] for m in processed_movies}
     if slug not in existing_slugs:
         return slug
@@ -177,9 +160,7 @@ def main():
 
     output_path = PROCESSED_DIR / "movies.json"
     output_path.write_text(json.dumps(processed, ensure_ascii=False, indent=2))
-    logger.info(
-        f"Silver transformation complete! Saved {len(processed)} movies to {output_path}"
-    )
+    logger.info(f"Silver transformation complete! Saved {len(processed)} movies to {output_path}")
 
 
 if __name__ == "__main__":

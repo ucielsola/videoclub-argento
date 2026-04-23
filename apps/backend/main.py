@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session, load_only
-from typing import List
-from sqlalchemy import func as sa_func
-from database import get_db, init_db, Movie, settings
-from schemas import MovieResponse, MovieListItem
-from etl import sync_movies
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func as sa_func
+from sqlalchemy.orm import Session, load_only
+
+from database import Movie, get_db, init_db, settings
+from etl import sync_movies
+from schemas import MovieListItem, MovieResponse
 
 init_db()
 
@@ -40,7 +41,7 @@ def read_root():
     return {"message": "Welcome to Video Club Argento API"}
 
 
-@app.get("/movies", response_model=List[MovieListItem])
+@app.get("/movies", response_model=list[MovieListItem])
 def get_movies(skip: int = 0, limit: int = 10000, db: Session = Depends(get_db)):
     movies = (
         db.query(Movie)
@@ -65,7 +66,7 @@ def get_movies(skip: int = 0, limit: int = 10000, db: Session = Depends(get_db))
     return movies
 
 
-@app.get("/movies/director/{director}", response_model=List[MovieListItem])
+@app.get("/movies/director/{director}", response_model=list[MovieListItem])
 def get_movies_by_director(director: str, db: Session = Depends(get_db)):
     movies = (
         db.query(Movie)
@@ -111,4 +112,4 @@ async def trigger_sync(db: Session = Depends(get_db)):
         count = await sync_movies(db, settings.TMDB_API_KEY, settings.OMDB_API_KEY)
         return {"message": f"Sync completed successfully. {count} new movies added."}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

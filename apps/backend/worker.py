@@ -12,11 +12,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from database import Movie, SessionLocal, settings, EnrichmentStatus
+from database import EnrichmentStatus, Movie, SessionLocal, settings
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 10
@@ -128,9 +126,7 @@ async def enrich_movie(movie_id: int, title: str, year: int | None):
                     movie.tmdb_id = tmdb_data.get("id")
                     movie.original_title = tmdb_data.get("original_title")
                     if tmdb_data.get("poster_path"):
-                        movie.poster_url = (
-                            f"{settings.TMDB_IMAGE_BASE}{tmdb_data.get('poster_path')}"
-                        )
+                        movie.poster_url = f"{settings.TMDB_IMAGE_BASE}{tmdb_data.get('poster_path')}"
                     if tmdb_data.get("backdrop_path"):
                         movie.backdrop_url = f"{settings.TMDB_BACKDROP_BASE}{tmdb_data.get('backdrop_path')}"
                     if not movie.tmdb_synopsis and tmdb_data.get("overview"):
@@ -142,31 +138,19 @@ async def enrich_movie(movie_id: int, title: str, year: int | None):
                     if not movie.runtime and tmdb_data.get("runtime"):
                         movie.runtime = tmdb_data.get("runtime")
                     if not movie.genres and tmdb_data.get("genres"):
-                        movie.genres = ", ".join(
-                            [g["name"] for g in tmdb_data.get("genres", [])]
-                        )
+                        movie.genres = ", ".join([g["name"] for g in tmdb_data.get("genres", [])])
 
                 if omdb_data:
-                    if (
-                        omdb_data.get("imdbRating")
-                        and omdb_data.get("imdbRating") != "N/A"
-                    ):
+                    if omdb_data.get("imdbRating") and omdb_data.get("imdbRating") != "N/A":
                         movie.imdb_rating = float(omdb_data.get("imdbRating"))
-                    if (
-                        omdb_data.get("imdbVotes")
-                        and omdb_data.get("imdbVotes") != "N/A"
-                    ):
-                        movie.imdb_votes = int(
-                            omdb_data.get("imdbVotes").replace(",", "")
-                        )
+                    if omdb_data.get("imdbVotes") and omdb_data.get("imdbVotes") != "N/A":
+                        movie.imdb_votes = int(omdb_data.get("imdbVotes").replace(",", ""))
                     if not movie.tmdb_synopsis and omdb_data.get("Plot") != "N/A":
                         movie.tmdb_synopsis = omdb_data.get("Plot")
 
                 if wiki_data:
                     movie.wiki_summary = wiki_data.get("extract")
-                    movie.wikipedia_url = (
-                        wiki_data.get("content_urls", {}).get("desktop", {}).get("page")
-                    )
+                    movie.wikipedia_url = wiki_data.get("content_urls", {}).get("desktop", {}).get("page")
 
                 movie.enrichment_status = EnrichmentStatus.COMPLETE
                 db.commit()
@@ -207,9 +191,7 @@ async def worker_loop():
             logger.info(f"Found {len(movies)} pending movies to process")
 
             for movie in movies:
-                db.query(Movie).filter(Movie.id == movie.id).update(
-                    {"enrichment_status": EnrichmentStatus.PROCESSING}
-                )
+                db.query(Movie).filter(Movie.id == movie.id).update({"enrichment_status": EnrichmentStatus.PROCESSING})
                 db.commit()
 
                 success = await enrich_movie(movie.id, movie.title, movie.year)

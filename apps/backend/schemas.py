@@ -1,48 +1,49 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel
+
 from database import EnrichmentStatus
 
 
 class MovieBase(BaseModel):
     title: str
-    director: Optional[str] = None
-    year: Optional[int] = None
-    official_media: Optional[str] = None
-    watch_link: Optional[str] = None
+    director: str | None = None
+    year: int | None = None
+    official_media: str | None = None
+    watch_link: str | None = None
 
-    tmdb_id: Optional[int] = None
-    original_title: Optional[str] = None
-    poster_url: Optional[str] = None
-    backdrop_url: Optional[str] = None
-    tmdb_synopsis: Optional[str] = None
-    rating: Optional[float] = None
-    vote_count: Optional[int] = None
-    runtime: Optional[int] = None
-    genres: Optional[str] = None
+    tmdb_id: int | None = None
+    original_title: str | None = None
+    poster_url: str | None = None
+    backdrop_url: str | None = None
+    tmdb_synopsis: str | None = None
+    rating: float | None = None
+    vote_count: int | None = None
+    runtime: int | None = None
+    genres: str | None = None
 
-    imdb_rating: Optional[float] = None
-    imdb_votes: Optional[int] = None
+    imdb_rating: float | None = None
+    imdb_votes: int | None = None
 
-    wiki_summary: Optional[str] = None
-    wikipedia_url: Optional[str] = None
+    wiki_summary: str | None = None
+    wikipedia_url: str | None = None
 
-    search_title: Optional[str] = None
-    slug: Optional[str] = None
+    search_title: str | None = None
+    slug: str | None = None
 
-    enrichment_status: Optional[EnrichmentStatus] = None
+    enrichment_status: EnrichmentStatus | None = None
 
 
 class MovieListItem(BaseModel):
     id: int
     title: str
-    year: Optional[int] = None
-    poster_url: Optional[str] = None
-    search_title: Optional[str] = None
-    slug: Optional[str] = None
-    director: Optional[str] = None
-    rating: Optional[float] = None
-    watch_link: Optional[str] = None
+    year: int | None = None
+    poster_url: str | None = None
+    search_title: str | None = None
+    slug: str | None = None
+    director: str | None = None
+    rating: float | None = None
+    watch_link: str | None = None
 
     class Config:
         from_attributes = True
@@ -50,8 +51,8 @@ class MovieListItem(BaseModel):
 
 class MovieResponse(MovieBase):
     id: int
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True

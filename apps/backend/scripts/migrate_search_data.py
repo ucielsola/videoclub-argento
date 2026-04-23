@@ -1,16 +1,16 @@
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from database import SessionLocal, Movie, settings
-from utils import normalize_for_search, get_unique_slug
 import logging
+
 import httpx
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+from database import Movie, SessionLocal, settings
+from utils import get_unique_slug, normalize_for_search
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 200
