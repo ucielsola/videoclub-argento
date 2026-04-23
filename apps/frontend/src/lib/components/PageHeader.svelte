@@ -10,11 +10,20 @@
 
 	let { title = 'Video Club Argento', children, actionsSlot }: Props = $props();
 
-	let scrollY = $state(0);
-	let scrolled = $derived(scrollY > 30);
+	let scrolled = $state(false);
+	let rafId = 0;
+
+	function handleScroll() {
+		cancelAnimationFrame(rafId);
+		rafId = requestAnimationFrame(() => {
+			const y = window.scrollY;
+			if (!scrolled && y > 20) scrolled = true;
+			else if (scrolled && y < 5) scrolled = false;
+		});
+	}
 </script>
 
-<svelte:window bind:scrollY={scrollY}></svelte:window>
+<svelte:window onscroll={handleScroll}></svelte:window>
 
 <div
 	class="sticky top-0 transition-all duration-300 {scrolled

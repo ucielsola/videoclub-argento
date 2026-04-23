@@ -3,9 +3,10 @@
 	import { movies } from '$lib/state';
 </script>
 
-<div class="mt-4 flex justify-center">
+	<div class="mt-4 flex justify-center">
 	<ButtonToggleGroup
 		color="gray"
+		class="overflow-hidden rounded-full"
 		value={movies.activeFilter}
 		onSelect={(v) => {
 			if (v) {
