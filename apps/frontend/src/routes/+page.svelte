@@ -26,26 +26,24 @@
 	{/snippet}
 </PageHeader>
 
-<div class="flex-1 flex flex-col overflow-hidden min-h-0">
-	<div class="container mx-auto px-4 py-6 flex flex-col min-h-0 flex-1">
-		<AlertMessage />
+<div class="container mx-auto px-4 py-6 pb-20">
+	<AlertMessage />
 
-		{#if movies.loading}
-			<div class="flex justify-center items-center h-64">
-				<Spinner size="12" />
-			</div>
-		{:else if movies.list.length === 0}
-			<div class="text-center py-12">
-				<p class="text-gray-500 dark:text-gray-400">No se encontraron películas. Haz clic en "Sincronizar" para cargarlas.</p>
-			</div>
-		{:else}
-			<MovieGrid />
-		{/if}
-	</div>
-
-	<Footer>
-		{#snippet children()}
-			<p>Video Club Argento &copy; {new Date().getFullYear()}</p>
-		{/snippet}
-	</Footer>
+	{#if movies.loading}
+		<div class="flex justify-center items-center h-64">
+			<Spinner size="12" />
+		</div>
+	{:else if movies.list.length === 0}
+		<div class="text-center py-12">
+			<p class="text-gray-500 dark:text-gray-400">No se encontraron películas. Haz clic en "Sincronizar" para cargarlas.</p>
+		</div>
+	{:else}
+		<MovieGrid />
+	{/if}
 </div>
+
+<Footer>
+	{#snippet children()}
+		<p>Video Club Argento &copy; {new Date().getFullYear()}</p>
+	{/snippet}
+</Footer>

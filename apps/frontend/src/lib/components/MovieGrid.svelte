@@ -19,20 +19,19 @@
 	let { itemHeight = 280, overscan = 3 }: Props = $props();
 </script>
 
-<div class="flex-1 min-h-0">
-	<VirtualList
-		bind:this={virtualList}
-		items={movies.filteredList}
-		{itemHeight}
-		{overscan}
-	>
-		{#snippet row({ item, index }: { item: MovieListItem; index: number })}
-			<div class="p-2 h-[280px]">
-				<MovieCard movie={item} />
-			</div>
-		{/snippet}
-	</VirtualList>
-</div>
+<VirtualList
+	bind:this={virtualList}
+	items={movies.filteredList}
+	{itemHeight}
+	{overscan}
+	useWindowScroll={true}
+>
+	{#snippet row({ item, index }: { item: MovieListItem; index: number })}
+		<div class="p-2 h-[280px]">
+			<MovieCard movie={item} />
+		</div>
+	{/snippet}
+</VirtualList>
 
 {#if movies.filteredList.length === 0 && movies.list.length > 0}
 	<div class="mt-8">

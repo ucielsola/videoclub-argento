@@ -8,6 +8,7 @@
 		gap?: number;
 		overscan?: number;
 		contained?: boolean;
+		useWindowScroll?: boolean;
 		row: Snippet<[{ item: T; index: number }]>;
 		children?: Snippet;
 	}
@@ -18,7 +19,8 @@
 		minColWidth = 340,
 		gap = 8,
 		overscan = 3,
-		contained = true, // Defaulting to true because it's a huge performance win
+		contained = true,
+		useWindowScroll = false,
 		row,
 		children
 	}: Props = $props();
@@ -37,18 +39,25 @@
 	const totalHeight = $derived(totalRows * rowHeight);
 
 	export function scrollToIndex(index: number, behavior: ScrollBehavior = 'auto') {
-		if (!containerRef || index < 0 || index >= items.length) return;
+		if (index < 0 || index >= items.length) return;
 
-		// Calculate which row this index lives on
 		const rowIndex = Math.floor(index / columnsCount);
-		// Calculate exactly where that row sits vertically
 		const targetScrollTop = rowIndex * rowHeight;
 
-		containerRef.scrollTo({ top: targetScrollTop, behavior });
+		if (useWindowScroll) {
+			const top = containerRef ? containerRef.offsetTop + targetScrollTop : targetScrollTop;
+			window.scrollTo({ top, behavior });
+		} else {
+			containerRef?.scrollTo({ top: targetScrollTop, behavior });
+		}
 	}
 
 	export function scrollTo(options?: ScrollToOptions) {
-		containerRef?.scrollTo(options);
+		if (useWindowScroll) {
+			window.scrollTo(options);
+		} else {
+			containerRef?.scrollTo(options);
+		}
 	}
 
 	const startRow = $derived(Math.max(0, Math.floor(scrollTop / rowHeight) - overscan));
@@ -69,19 +78,50 @@
 
 	const offsetY = $derived(startRow * rowHeight);
 
-	function handleScroll(e: Event) {
+	function handleContainerScroll(e: Event) {
 		scrollTop = (e.currentTarget as HTMLElement).scrollTop;
 	}
+
+	$effect(() => {
+		if (!containerRef) return;
+
+		const observer = new ResizeObserver(() => {
+			containerWidth = containerRef!.clientWidth;
+			if (!useWindowScroll) {
+				containerHeight = containerRef!.clientHeight;
+			}
+		});
+		observer.observe(containerRef);
+		return () => observer.disconnect();
+	});
+
+	$effect(() => {
+		if (!useWindowScroll || !containerRef) return;
+
+		const update = () => {
+			if (!containerRef) return;
+			const rect = containerRef.getBoundingClientRect();
+			scrollTop = Math.max(0, -rect.top);
+			containerHeight = Math.max(0, window.innerHeight - Math.max(0, rect.top));
+		};
+
+		update();
+
+		window.addEventListener('scroll', update, { passive: true });
+		window.addEventListener('resize', update, { passive: true });
+		return () => {
+			window.removeEventListener('scroll', update);
+			window.removeEventListener('resize', update);
+		};
+	});
 </script>
 
 <div
 	bind:this={containerRef}
-	bind:clientHeight={containerHeight}
-	bind:clientWidth={containerWidth}
-	onscroll={handleScroll}
+	onscroll={useWindowScroll ? undefined : handleContainerScroll}
 	role="list"
 	aria-label="Virtual grid"
-	class="relative h-full overflow-y-auto [-webkit-overflow-scrolling:touch]"
+	class="relative {useWindowScroll ? '' : 'h-full overflow-y-auto [-webkit-overflow-scrolling:touch]'}"
 >
 	<div class="relative w-full" style="height: {totalHeight}px;">
 		<div class="absolute left-0 top-0 w-full" style="transform: translateY({offsetY}px);">
