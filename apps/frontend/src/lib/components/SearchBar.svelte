@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Search } from 'lucide-svelte';
+	import { Search, X } from 'lucide-svelte';
 	import { movies } from '$lib/state';
 
 	let inputValue = $state('');
@@ -13,6 +13,12 @@
 			movies.setSearchQuery(value);
 		}, 500);
 	}
+
+	function handleClear() {
+		inputValue = '';
+		clearTimeout(debounceTimer);
+		movies.setSearchQuery('');
+	}
 </script>
 
 <div class="relative">
@@ -23,6 +29,16 @@
 		value={inputValue}
 		oninput={handleInput}
 		aria-label="Buscar películas"
-		class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+		class="w-full pl-10 {inputValue ? 'pr-10' : 'pr-4'} py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
 	/>
+	{#if inputValue}
+		<button
+			type="button"
+			onclick={handleClear}
+			class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+			aria-label="Limpiar búsqueda"
+		>
+			<X class="w-5 h-5" />
+		</button>
+	{/if}
 </div>
