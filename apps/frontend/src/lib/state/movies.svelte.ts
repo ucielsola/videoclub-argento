@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import type { MovieListItem, SortMode } from '$lib/types';
+import type { MovieListItem, SortMode, SortDirection } from '$lib/types';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -14,6 +14,7 @@ class MoviesStore {
 	#searchQuery = $state('');
 	#activeFilter = $state<FilterMode>('all');
 	#sortBy = $state<SortMode>('title');
+	#sortDirection = $state<SortDirection>('asc');
 
 	constructor() {
 		this.loadMovies();
@@ -32,6 +33,9 @@ class MoviesStore {
 
 	get sortBy(): SortMode { return this.#sortBy; }
 	set sortBy(v: SortMode) { this.#sortBy = v; }
+
+	get sortDirection(): SortDirection { return this.#sortDirection; }
+	set sortDirection(v: SortDirection) { this.#sortDirection = v; }
 
 	get #fuseInstance(): Fuse<MovieListItem> {
 		return new Fuse(this.#list, {
@@ -76,9 +80,9 @@ class MoviesStore {
 		}
 
 		if (this.#sortBy === 'title') {
-			results.sort((a, b) => a.title.localeCompare(b.title));
+			results.sort((a, b) => a.title.localeCompare(b.title) * (this.#sortDirection === 'asc' ? 1 : -1));
 		} else {
-			results.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+			results.sort((a, b) => ((a.year ?? 0) - (b.year ?? 0)) * (this.#sortDirection === 'asc' ? 1 : -1));
 		}
 
 		return results;

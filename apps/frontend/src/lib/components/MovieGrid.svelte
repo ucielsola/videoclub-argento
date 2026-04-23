@@ -3,6 +3,7 @@
 	import VirtualList from './VirtualList.svelte';
 	import MovieCard from './MovieCard.svelte';
 	import { Alert, Badge } from 'flowbite-svelte';
+	import { ArrowUpNarrowWide, ArrowDownNarrowWide } from 'lucide-svelte';
 	import { movies } from '$lib/state';
 
 	let virtualList: ReturnType<typeof VirtualList> | undefined = $state();
@@ -23,12 +24,16 @@
 	let timeout: ReturnType<typeof setTimeout> | undefined;
 
 	function setSort(mode: SortMode) {
-		if (mode === movies.sortBy) return;
+		if (mode === movies.sortBy) {
+			movies.sortDirection = movies.sortDirection === 'asc' ? 'desc' : 'asc';
+			return;
+		}
 		gridOpacity = 0;
 		gridTranslateY = 8;
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			movies.sortBy = mode;
+			movies.sortDirection = 'asc';
 			gridOpacity = 1;
 			gridTranslateY = 0;
 		}, 200);
@@ -55,6 +60,18 @@
 	>
 		Año
 	</Badge>
+	<button
+		type="button"
+		onclick={() => (movies.sortDirection = movies.sortDirection === 'asc' ? 'desc' : 'asc')}
+		class="inline-flex items-center justify-center rounded-full p-2 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+		aria-label="Cambiar dirección de ordenamiento"
+	>
+		{#if movies.sortDirection === 'asc'}
+			<ArrowUpNarrowWide class="h-4 w-4" />
+		{:else}
+			<ArrowDownNarrowWide class="h-4 w-4" />
+		{/if}
+	</button>
 </div>
 
 <div

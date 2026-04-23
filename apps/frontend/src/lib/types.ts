@@ -1,4 +1,5 @@
 export type SortMode = 'title' | 'year';
+export type SortDirection = 'asc' | 'desc';
 
 export enum EnrichmentStatus {
 	Pending = 'PENDING',
