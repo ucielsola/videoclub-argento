@@ -1,3 +1,10 @@
+# Agent runtime data (keep skills committed)
+.opencode/sessions/
+.opencode/context/
+
+# LobeHub credentials (personal, never commit)
+.lobehub-market/
+
 # Root-level ignored files (cross-repo artifacts)
 node_modules/
 .turbo/
