@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { movies } from "$lib/state";
-    import type { FilterMode } from "$lib/state/movies.svelte";
+import { movies } from "$lib/state";
+import type { FilterMode } from "$lib/state/movies.svelte";
 
-    const filters: { value: FilterMode; label: string }[] = [
-        { value: "all", label: "Todo" },
-        { value: "title", label: "Título" },
-        { value: "director", label: "Director" },
-        { value: "year", label: "Año" },
-    ];
+const filters: { value: FilterMode; label: string }[] = [
+	{ value: "all", label: "Todo" },
+	{ value: "title", label: "Título" },
+	{ value: "director", label: "Director" },
+	{ value: "year", label: "Año" },
+];
 
-    function select(value: FilterMode) {
-        movies.setFilter(value === movies.activeFilter ? "all" : value);
-    }
+function select(value: FilterMode) {
+	movies.setFilter(value === movies.activeFilter ? "all" : value);
+}
 </script>
 
 <div class="flex items-center gap-2">

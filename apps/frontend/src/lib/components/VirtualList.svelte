@@ -1,149 +1,144 @@
 <script lang="ts" generics="T">
-    import type { Snippet } from "svelte";
-    import { fade } from "svelte/transition";
+import type { Snippet } from "svelte";
+import { fade } from "svelte/transition";
 
-    interface Props {
-        items: T[];
-        itemHeight: number;
-        minColWidth?: number;
-        gap?: number;
-        overscan?: number;
-        useWindowScroll?: boolean;
-        row: Snippet<[{ item: T; index: number }]>;
-        children?: Snippet;
-    }
+interface Props {
+	items: T[];
+	itemHeight: number;
+	minColWidth?: number;
+	gap?: number;
+	overscan?: number;
+	useWindowScroll?: boolean;
+	row: Snippet<[{ item: T; index: number }]>;
+	children?: Snippet;
+}
 
-    let {
-        items,
-        itemHeight,
-        minColWidth = 340,
-        gap = 8,
-        overscan = 3,
-        useWindowScroll = false,
-        row,
-        children,
-    }: Props = $props();
+let {
+	items,
+	itemHeight,
+	minColWidth = 340,
+	gap = 8,
+	overscan = 3,
+	useWindowScroll = false,
+	row,
+	children,
+}: Props = $props();
 
-    let scrollTop = $state(0);
-    let containerHeight = $state(0);
-    let containerWidth = $state(0);
-    let containerRef: HTMLDivElement | undefined = $state();
+let scrollTop = $state(0);
+let containerHeight = $state(0);
+let containerWidth = $state(0);
+let containerRef: HTMLDivElement | undefined = $state();
 
-    let containerTop = 0;
-    let rafId = 0;
+let containerTop = 0;
+let rafId = 0;
 
-    const columnsCount = $derived(
-        Math.max(1, Math.floor(containerWidth / minColWidth)),
-    );
+const columnsCount = $derived(
+	Math.max(1, Math.floor(containerWidth / minColWidth)),
+);
 
-    const rowHeight = $derived(itemHeight + gap);
-    const totalRows = $derived(Math.ceil(items.length / columnsCount));
-    const totalHeight = $derived(totalRows * rowHeight);
+const rowHeight = $derived(itemHeight + gap);
+const totalRows = $derived(Math.ceil(items.length / columnsCount));
+const totalHeight = $derived(totalRows * rowHeight);
 
-    export function scrollToIndex(
-        index: number,
-        behavior: ScrollBehavior = "auto",
-    ) {
-        if (index < 0 || index >= items.length) return;
+export function scrollToIndex(
+	index: number,
+	behavior: ScrollBehavior = "auto",
+) {
+	if (index < 0 || index >= items.length) return;
 
-        const rowIndex = Math.floor(index / columnsCount);
-        const targetScrollTop = rowIndex * rowHeight;
+	const rowIndex = Math.floor(index / columnsCount);
+	const targetScrollTop = rowIndex * rowHeight;
 
-        if (useWindowScroll) {
-            const top = containerRef
-                ? containerTop + targetScrollTop
-                : targetScrollTop;
-            window.scrollTo({ top, behavior });
-        } else {
-            containerRef?.scrollTo({ top: targetScrollTop, behavior });
-        }
-    }
+	if (useWindowScroll) {
+		const top = containerRef ? containerTop + targetScrollTop : targetScrollTop;
+		window.scrollTo({ top, behavior });
+	} else {
+		containerRef?.scrollTo({ top: targetScrollTop, behavior });
+	}
+}
 
-    export function scrollTo(options?: ScrollToOptions) {
-        if (useWindowScroll) {
-            window.scrollTo(options);
-        } else {
-            containerRef?.scrollTo(options);
-        }
-    }
+export function scrollTo(options?: ScrollToOptions) {
+	if (useWindowScroll) {
+		window.scrollTo(options);
+	} else {
+		containerRef?.scrollTo(options);
+	}
+}
 
-    const startRow = $derived(
-        Math.max(0, Math.floor(scrollTop / rowHeight) - overscan),
-    );
-    const visibleRows = $derived(
-        Math.ceil(containerHeight / rowHeight) + overscan * 2,
-    );
-    const endRow = $derived(Math.min(totalRows, startRow + visibleRows));
+const startRow = $derived(
+	Math.max(0, Math.floor(scrollTop / rowHeight) - overscan),
+);
+const visibleRows = $derived(
+	Math.ceil(containerHeight / rowHeight) + overscan * 2,
+);
+const endRow = $derived(Math.min(totalRows, startRow + visibleRows));
 
-    const visibleItems = $derived.by(() => {
-        const result: { item: T; index: number }[] = [];
-        for (let rowIdx = startRow; rowIdx < endRow; rowIdx++) {
-            const startIdx = rowIdx * columnsCount;
-            const endIdx = Math.min(startIdx + columnsCount, items.length);
-            for (let i = startIdx; i < endIdx; i++) {
-                result.push({ item: items[i], index: i });
-            }
-        }
-        return result;
-    });
+const visibleItems = $derived.by(() => {
+	const result: { item: T; index: number }[] = [];
+	for (let rowIdx = startRow; rowIdx < endRow; rowIdx++) {
+		const startIdx = rowIdx * columnsCount;
+		const endIdx = Math.min(startIdx + columnsCount, items.length);
+		for (let i = startIdx; i < endIdx; i++) {
+			result.push({ item: items[i], index: i });
+		}
+	}
+	return result;
+});
 
-    const offsetY = $derived(startRow * rowHeight);
+const offsetY = $derived(startRow * rowHeight);
 
-    function handleContainerScroll(e: Event) {
-        scrollTop = (e.currentTarget as HTMLElement).scrollTop;
-    }
+function handleContainerScroll(e: Event) {
+	scrollTop = (e.currentTarget as HTMLElement).scrollTop;
+}
 
-    function recalcTop() {
-        if (!containerRef) return;
-        containerTop = containerRef.offsetTop;
-    }
+function recalcTop() {
+	if (!containerRef) return;
+	containerTop = containerRef.offsetTop;
+}
 
-    function scheduleWindowUpdate() {
-        cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-            if (!containerRef) return;
-            const rect = containerRef.getBoundingClientRect();
-            scrollTop = Math.max(0, -rect.top);
-            containerHeight = Math.max(
-                0,
-                window.innerHeight - Math.max(0, rect.top),
-            );
-        });
-    }
+function scheduleWindowUpdate() {
+	cancelAnimationFrame(rafId);
+	rafId = requestAnimationFrame(() => {
+		if (!containerRef) return;
+		const rect = containerRef.getBoundingClientRect();
+		scrollTop = Math.max(0, -rect.top);
+		containerHeight = Math.max(0, window.innerHeight - Math.max(0, rect.top));
+	});
+}
 
-    $effect(() => {
-        if (containerRef === undefined) return;
+$effect(() => {
+	if (containerRef === undefined) return;
 
-        const observer = new ResizeObserver(() => {
-            if (containerRef === undefined) return;
-            containerWidth = containerRef.clientWidth;
-            if (!useWindowScroll) {
-                containerHeight = containerRef.clientHeight;
-            }
-        });
-        observer.observe(containerRef);
-        return () => observer.disconnect();
-    });
+	const observer = new ResizeObserver(() => {
+		if (containerRef === undefined) return;
+		containerWidth = containerRef.clientWidth;
+		if (!useWindowScroll) {
+			containerHeight = containerRef.clientHeight;
+		}
+	});
+	observer.observe(containerRef);
+	return () => observer.disconnect();
+});
 
-    $effect(() => {
-        if (!useWindowScroll || !containerRef) return;
+$effect(() => {
+	if (!useWindowScroll || !containerRef) return;
 
-        recalcTop();
+	recalcTop();
 
-        scheduleWindowUpdate();
+	scheduleWindowUpdate();
 
-        window.addEventListener("scroll", scheduleWindowUpdate, {
-            passive: true,
-        });
-        window.addEventListener("resize", scheduleWindowUpdate, {
-            passive: true,
-        });
-        return () => {
-            window.removeEventListener("scroll", scheduleWindowUpdate);
-            window.removeEventListener("resize", scheduleWindowUpdate);
-            cancelAnimationFrame(rafId);
-        };
-    });
+	window.addEventListener("scroll", scheduleWindowUpdate, {
+		passive: true,
+	});
+	window.addEventListener("resize", scheduleWindowUpdate, {
+		passive: true,
+	});
+	return () => {
+		window.removeEventListener("scroll", scheduleWindowUpdate);
+		window.removeEventListener("resize", scheduleWindowUpdate);
+		cancelAnimationFrame(rafId);
+	};
+});
 </script>
 
 <div

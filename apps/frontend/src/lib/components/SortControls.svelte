@@ -1,18 +1,17 @@
 <script lang="ts">
-    import { Badge } from "flowbite-svelte";
-    import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-svelte";
-    import { movies } from "$lib/state";
-    import type { SortMode } from "$lib/types";
+import { Badge } from "flowbite-svelte";
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-svelte";
+import { movies } from "$lib/state";
+import type { SortMode } from "$lib/types";
 
-    function setSort(mode: SortMode) {
-        if (mode === movies.sortBy) {
-            movies.sortDirection =
-                movies.sortDirection === "asc" ? "desc" : "asc";
-            return;
-        }
-        movies.sortBy = mode;
-        movies.sortDirection = "asc";
-    }
+function setSort(mode: SortMode) {
+	if (mode === movies.sortBy) {
+		movies.sortDirection = movies.sortDirection === "asc" ? "desc" : "asc";
+		return;
+	}
+	movies.sortBy = mode;
+	movies.sortDirection = "asc";
+}
 </script>
 
 <div class="flex items-center gap-2">

@@ -1,19 +1,19 @@
 <script lang="ts">
-    import type { Snippet } from "svelte";
+import type { Snippet } from "svelte";
 
-    import { movies } from "$lib/state";
-    import FilterPills from "./FilterPills.svelte";
-    import HeaderSearch from "./HeaderSearch.svelte";
-    import SortControls from "./SortControls.svelte";
-    import Logo from "./Logo.svelte";
-    import ThemeToggle from "./ThemeToggle.svelte";
+import { movies } from "$lib/state";
+import FilterPills from "./FilterPills.svelte";
+import HeaderSearch from "./HeaderSearch.svelte";
+import Logo from "./Logo.svelte";
+import SortControls from "./SortControls.svelte";
+import ThemeToggle from "./ThemeToggle.svelte";
 
-    interface Props {
-        title?: string;
-        actionsSlot?: Snippet;
-    }
+interface Props {
+	title?: string;
+	actionsSlot?: Snippet;
+}
 
-    let { title = "Video Club Argento", actionsSlot }: Props = $props();
+let { title = "Video Club Argento", actionsSlot }: Props = $props();
 </script>
 
 <div class="h-56 md:h-52"></div>

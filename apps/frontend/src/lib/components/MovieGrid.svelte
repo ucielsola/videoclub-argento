@@ -1,24 +1,24 @@
 <script lang="ts">
-    import { Alert } from "flowbite-svelte";
-    import { movies } from "$lib/state";
-    import type { MovieListItem } from "$lib/types";
-    import MovieCard from "./MovieCard.svelte";
-    import VirtualList from "./VirtualList.svelte";
+import { Alert } from "flowbite-svelte";
+import { movies } from "$lib/state";
+import type { MovieListItem } from "$lib/types";
+import MovieCard from "./MovieCard.svelte";
+import VirtualList from "./VirtualList.svelte";
 
-    let virtualList: ReturnType<typeof VirtualList> | undefined = $state();
+let virtualList: ReturnType<typeof VirtualList> | undefined = $state();
 
-    export function scrollToIndex(index: number, behavior?: ScrollBehavior) {
-        virtualList?.scrollToIndex(index, behavior);
-    }
+export function scrollToIndex(index: number, behavior?: ScrollBehavior) {
+	virtualList?.scrollToIndex(index, behavior);
+}
 
-    interface Props {
-        itemHeight?: number;
-        overscan?: number;
-    }
+interface Props {
+	itemHeight?: number;
+	overscan?: number;
+}
 
-    let { itemHeight = 280, overscan = 24 }: Props = $props();
+let { itemHeight = 280, overscan = 24 }: Props = $props();
 
-    let filteredList = $derived(movies.filteredList);
+let filteredList = $derived(movies.filteredList);
 </script>
 
 <VirtualList

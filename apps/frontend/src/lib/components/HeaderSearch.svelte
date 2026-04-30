@@ -1,38 +1,38 @@
 <script lang="ts">
-    import { Search, X } from "lucide-svelte";
-    import { movies } from "$lib/state";
+import { Search, X } from "lucide-svelte";
+import { movies } from "$lib/state";
 
-    let inputValue = $state("");
-    let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-    const validYearRegex = /^\d{0,4}$/;
+let inputValue = $state("");
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+const validYearRegex = /^\d{0,4}$/;
 
-    function handleInput(e: Event) {
-        const value = (e.target as HTMLInputElement).value;
+function handleInput(e: Event) {
+	const value = (e.target as HTMLInputElement).value;
 
-        // Allow the user to clear the field (empty string)
-        // OR check if it's a valid 1-4 digit number
-        if (
-            movies.activeFilter === "year" &&
-            value !== "" &&
-            !validYearRegex.test(value)
-        ) {
-            // Reset the input element's value to the last valid state
-            (e.target as HTMLInputElement).value = inputValue;
-            return;
-        }
+	// Allow the user to clear the field (empty string)
+	// OR check if it's a valid 1-4 digit number
+	if (
+		movies.activeFilter === "year" &&
+		value !== "" &&
+		!validYearRegex.test(value)
+	) {
+		// Reset the input element's value to the last valid state
+		(e.target as HTMLInputElement).value = inputValue;
+		return;
+	}
 
-        inputValue = value;
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            movies.setSearchQuery(value);
-        }, 300);
-    }
+	inputValue = value;
+	clearTimeout(debounceTimer);
+	debounceTimer = setTimeout(() => {
+		movies.setSearchQuery(value);
+	}, 300);
+}
 
-    function handleClear() {
-        inputValue = "";
-        clearTimeout(debounceTimer);
-        movies.setSearchQuery("");
-    }
+function handleClear() {
+	inputValue = "";
+	clearTimeout(debounceTimer);
+	movies.setSearchQuery("");
+}
 </script>
 
 <div class="relative flex-1 max-w-2xl mx-auto">

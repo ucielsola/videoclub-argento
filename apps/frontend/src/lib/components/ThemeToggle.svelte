@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Moon, Sun } from "lucide-svelte";
+import { Moon, Sun } from "lucide-svelte";
 
-    import { theme } from "$lib/state";
+import { theme } from "$lib/state";
 </script>
 
 <button
