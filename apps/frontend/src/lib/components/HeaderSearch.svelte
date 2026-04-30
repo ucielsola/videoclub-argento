@@ -25,7 +25,7 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             movies.setSearchQuery(value);
-        }, 500);
+        }, 300);
     }
 
     function handleClear() {

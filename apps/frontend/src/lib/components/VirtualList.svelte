@@ -1,5 +1,6 @@
 <script lang="ts" generics="T">
     import type { Snippet } from "svelte";
+    import { fade } from "svelte/transition";
 
     interface Props {
         items: T[];
@@ -7,7 +8,6 @@
         minColWidth?: number;
         gap?: number;
         overscan?: number;
-        contained?: boolean;
         useWindowScroll?: boolean;
         row: Snippet<[{ item: T; index: number }]>;
         children?: Snippet;
@@ -19,7 +19,6 @@
         minColWidth = 340,
         gap = 8,
         overscan = 3,
-        contained = true,
         useWindowScroll = false,
         row,
         children,
@@ -113,12 +112,13 @@
     }
 
     $effect(() => {
-        if (!containerRef) return;
+        if (containerRef === undefined) return;
 
         const observer = new ResizeObserver(() => {
-            containerWidth = containerRef!.clientWidth;
+            if (containerRef === undefined) return;
+            containerWidth = containerRef.clientWidth;
             if (!useWindowScroll) {
-                containerHeight = containerRef!.clientHeight;
+                containerHeight = containerRef.clientHeight;
             }
         });
         observer.observe(containerRef);
@@ -175,6 +175,7 @@
                     <div
                         class="w-full"
                         style="height: {itemHeight}px; content-visibility: auto; contain-intrinsic-size: 0 {itemHeight}px;"
+                        transition:fade
                     >
                         {@render row({ item, index })}
                     </div>
