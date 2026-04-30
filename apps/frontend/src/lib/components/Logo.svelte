@@ -1,5 +1,5 @@
 <svg
-    class="logo-icon text-white"
+    class="logo-icon text-white size-10"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
