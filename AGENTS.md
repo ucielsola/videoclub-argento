@@ -11,18 +11,16 @@ apps/backend/   FastAPI + SQLAlchemy + PostgreSQL (Python 3.14+, uv)
 apps/frontend/  SvelteKit + Tailwind CSS v4 + Flowbite Svelte
 ```
 
-Root `package.json` uses pnpm + Turborepo to orchestrate.
+Root `package.json` uses pnpm workspaces to orchestrate. No Turborepo.
 
 ## Commands
 
 ```bash
-pnpm dev          # Run both apps
 pnpm dev:fe       # Frontend only (port 5173)
-pnpm dev:be       # Backend only (port 8000)
-pnpm build        # Build both
-pnpm check        # Typecheck both
-pnpm lint         # Lint both
-pnpm generate-client  # Generate OpenAPI client from backend spec
+pnpm dev:be       # Backend only (port 8000, native uv)
+pnpm build        # Build frontend (for Vercel)
+pnpm check        # Typecheck frontend
+pnpm lint         # Lint both apps
 ```
 
 ## Backend (apps/backend/)
@@ -34,6 +32,20 @@ pnpm generate-client  # Generate OpenAPI client from backend spec
 - **API**: 6 endpoints in `main.py` (movies CRUD + sheets sync)
 - **ETL**: Google Sheets → TMDB/OMDb → DB (in-process via `etl.py` + medallion scripts in `scripts/`)
 - **Worker**: `worker.py` — background enrichment for PENDING movies
+- **Docker**: `Dockerfile` + `docker-compose.yml` — production deployment via Docker containers
+
+### Production (Docker)
+
+```bash
+docker compose up -d            # Start db + backend + worker
+docker compose up -d backend    # Start/rebuild backend only
+docker compose logs -f backend  # View backend logs
+docker compose down             # Stop all services
+```
+
+All services use `restart: unless-stopped` — auto-recover after power outage.
+
+The `backend` and `worker` services use the same Docker image (different CMD). Both load env vars from `apps/backend/.env` and override `DATABASE_URL` to point to the `db` service on the Docker network.
 
 ## Frontend (apps/frontend/)
 
@@ -42,8 +54,17 @@ pnpm generate-client  # Generate OpenAPI client from backend spec
 - **Config**: Biome in `biome.json` — tabs, double quotes, recommended rules
 - **Search**: Fuse.js for client-side fuzzy search
 - **State**: Svelte 5 class-based stores in `src/lib/state/` (MoviesStore, ThemeStore)
-- **API**: Raw fetch to `http://localhost:8000` (OpenAPI client generated but unused)
+- **API**: Hand-written client in `src/lib/api-client.ts` — raw fetch to backend
 - **VirtualList**: Custom virtual-scrolled grid for large movie lists
+- **Deploy**: Vercel (adapter-auto)
+
+### Frontend Environment Variables (for Vercel)
+
+Set these in Vercel dashboard pointing to your Cloudflare tunnel domain:
+```
+PRIVATE_API_BASE_URL=https://<tunnel-domain>   # SSR fetch from Vercel servers
+PUBLIC_API_BASE_URL=https://<tunnel-domain>    # Client-side fetch from browser
+```
 
 ## Conventions
 

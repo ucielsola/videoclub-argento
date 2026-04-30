@@ -7,7 +7,6 @@
 
 # Root-level ignored files (cross-repo artifacts)
 node_modules/
-.turbo/
 .svelte-kit/
 .DS_Store
 .DS_Store?

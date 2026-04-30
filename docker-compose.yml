@@ -21,5 +21,26 @@ services:
     depends_on:
       - db
 
+  backend:
+    build: ./apps/backend
+    ports:
+      - "8000:8000"
+    env_file: ./apps/backend/.env
+    environment:
+      DATABASE_URL: postgresql://videouser:videopassword@db:5432/videoclub
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  worker:
+    build: ./apps/backend
+    command: ["uv", "run", "python", "worker.py"]
+    env_file: ./apps/backend/.env
+    environment:
+      DATABASE_URL: postgresql://videouser:videopassword@db:5432/videoclub
+    depends_on:
+      - db
+    restart: unless-stopped
+
 volumes:
   postgres_data:

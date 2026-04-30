@@ -18,6 +18,20 @@ uv run ruff format .     # Format
 uv run ruff check --fix . # Lint + autofix
 ```
 
+## Docker (Production)
+```bash
+docker compose up -d             # Start db + backend + worker
+docker compose build backend     # Rebuild image after code changes
+docker compose logs -f backend   # View logs
+docker compose logs -f worker    # View worker logs
+docker compose down              # Stop all
+```
+
+- **Backend** serves API on port 8000 (`restart: unless-stopped`)
+- **Worker** runs `worker.py` as a separate container from the same image
+- Both load `apps/backend/.env` and override `DATABASE_URL` to `db:5432` (Docker network)
+- Served externally via Cloudflare tunnel → `localhost:8000`
+
 ## Key Files
 | File | Purpose |
 |---|---|
@@ -27,7 +41,8 @@ uv run ruff check --fix . # Lint + autofix
 | `etl.py` | In-process sync: CSV → TMDB/OMDb → DB (triggered by `POST /sheets/sync`) |
 | `worker.py` | Background process: enriches PENDING movies (TMDB + OMDb + Wikipedia) |
 | `utils.py` | `generate_slug()`, `normalize_for_search()` |
-| `export_openapi.py` | Dumps OpenAPI spec to `openapi.json` |
+| `Dockerfile` | Production image: python:3.14-slim + uv, uvicorn entrypoint |
+| `.dockerignore` | Excludes .venv, .env, data/, cache dirs |
 
 ## Medallion Scripts (`scripts/`)
 - `01_ingest.py` — Bronze: raw API ingestion with local JSON caching to `data/raw/`
@@ -57,6 +72,8 @@ OMDB_API_KEY=...
 CORS_ORIGINS=*
 BATCH_SIZE=200
 ```
+
+Note: `DATABASE_URL` is overridden in `docker-compose.yml` to `postgresql://videouser:videopassword@db:5432/videoclub` for containers.
 
 ## Ruff Config (in `pyproject.toml`)
 - Target: py314, line-length: 120

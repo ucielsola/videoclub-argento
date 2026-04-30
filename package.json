@@ -3,19 +3,11 @@
   "private": true,
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "dev": "turbo run dev",
-    "dev:fe": "turbo run dev --filter=frontend",
-    "dev:be": "turbo run dev --filter=backend",
-    "build": "turbo run build",
-    "build:fe": "turbo run build --filter=frontend",
-    "build:be": "turbo run build --filter=backend",
-    "check": "turbo run check",
-    "check:watch": "turbo run check:watch",
-    "generate-client": "turbo run generate-client",
-    "lint": "turbo run lint"
-  },
-  "devDependencies": {
-    "turbo": "latest"
+    "dev:fe": "pnpm --filter frontend dev",
+    "dev:be": "pnpm --filter backend dev",
+    "build": "pnpm --filter frontend build",
+    "lint": "pnpm --filter backend lint && pnpm --filter frontend lint",
+    "check": "pnpm --filter frontend check"
   },
   "volta": {
     "node": "25.9.0",

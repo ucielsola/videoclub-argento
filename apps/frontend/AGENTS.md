@@ -14,11 +14,10 @@ SvelteKit web interface for browsing and managing the Argentine cinema collectio
 
 ## Commands
 ```bash
-pnpm dev:fe                        # Start dev server (port 5173)
+pnpm dev:fe                                # Start dev server (port 5173)
 pnpm --filter frontend biome check .       # Lint
 pnpm --filter frontend biome format --write .  # Format
-pnpm --filter frontend check       # Typecheck (svelte-check)
-pnpm generate-client               # Generate OpenAPI client (unused currently)
+pnpm --filter frontend check               # Typecheck (svelte-check)
 ```
 
 ## Directory Structure
@@ -27,6 +26,7 @@ src/
   app.css              # Tailwind v4 config (imports, plugins, custom variants, utilities)
   app.html             # HTML shell with inline dark-mode flash prevention
   lib/
+    api-client.ts      # Hand-written API client (raw fetch to backend)
     types.ts           # Movie type definitions
     components/
       PageHeader       # Sticky header with scroll-based compaction animation
@@ -44,7 +44,7 @@ src/
       theme.svelte.ts  # ThemeStore: dark/light toggle, localStorage persistence
   routes/
     +page.svelte       # Home: movie grid with search/filter/sort
-    +page.ts           # SSR: fetch all movies
+    +page.server.ts    # SSR: fetch all movies via api-client
     movies/[slug]/     # Movie detail page
     directors/[director]/ # Director filmography page
     +layout.svelte     # Root layout: CSS import, bg-grid-pattern, ScrollToTop
@@ -53,8 +53,20 @@ src/
 ## State Pattern (Svelte 5 Runes)
 Class-based stores with private `#field = $state()` and public getters. Singletons exported from `src/lib/state/index.ts`.
 
-## API Calls
-Currently uses raw `fetch` to `http://localhost:8000` (or `127.0.0.1:8000` for SSR). OpenAPI client is generated but not wired up.
+## API Client (`src/lib/api-client.ts`)
+Hand-written client using raw `fetch`. Resolves base URL from environment variables:
+- **SSR** (server-side): `PRIVATE_API_BASE_URL` — defaults to `http://127.0.0.1:8000`
+- **Browser** (client-side): `PUBLIC_API_BASE_URL` — defaults to `http://localhost:8000`
+
+For Vercel deployment, set both to the Cloudflare tunnel domain.
+
+## Deployment (Vercel)
+- Uses `adapter-auto` (auto-detects Vercel)
+- Set env vars in Vercel dashboard:
+  ```
+  PRIVATE_API_BASE_URL=https://<tunnel-domain>
+  PUBLIC_API_BASE_URL=https://<tunnel-domain>
+  ```
 
 ## Biome Config (`biome.json`)
 - Tabs for indentation, double quotes for JS

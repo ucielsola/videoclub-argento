@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.ruff_cache/
+.turbo/
+.env
+*.db
+data/
+.git/
+.python-version
+AGENTS.md
+README.md
+package.json
+videoclub.db

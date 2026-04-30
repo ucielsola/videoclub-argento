@@ -4,8 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "uv run fastapi dev main.py",
-    "export-openapi": "uv run python export_openapi.py",
-    "build": "uv run python export_openapi.py && echo 'Backend validated'",
     "lint": "uv run ruff check .",
     "lint:fix": "uv run ruff check --fix .",
     "format": "uv run ruff format .",
