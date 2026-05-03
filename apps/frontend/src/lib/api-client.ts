@@ -34,8 +34,13 @@ function buildQuery(params?: MoviesParams): string {
 }
 
 export const api = {
-	getMovies: (fetch?: typeof globalThis.fetch, params?: MoviesParams) =>
-		get<MovieListItem[]>(`${API_PREFIX}/movies${buildQuery(params)}`, fetch),
+	getMovies: async (fetch?: typeof globalThis.fetch, params?: MoviesParams) => {
+		const res = await get<{ movies: MovieListItem[] }>(
+			`${API_PREFIX}/movies${buildQuery(params)}`,
+			fetch,
+		);
+		return res.movies;
+	},
 	getMovieBySlug: (slug: string, fetch?: typeof globalThis.fetch) =>
 		get<MovieDetail>(`${API_PREFIX}/movies/${slug}`, fetch),
 };
