@@ -1,6 +1,11 @@
 export type SortMode = "title" | "year" | "director";
 export type SortDirection = "asc" | "desc";
 
+export interface Category {
+	name: string;
+	movie_count: number;
+}
+
 export interface MovieListItem {
 	hash: string;
 	slug: string;
