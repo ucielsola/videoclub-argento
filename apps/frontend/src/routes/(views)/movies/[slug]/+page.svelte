@@ -10,8 +10,8 @@ import {
 	Trophy,
 	Users,
 } from "lucide-svelte";
-import { resolvePosterUrl } from "$lib/api-client";
 import SynopsisTabs from "$lib/components/SynopsisTabs.svelte";
+import { resolvePosterUrl } from "$lib/poster";
 import type { MovieDetail } from "$lib/types";
 
 interface Props {

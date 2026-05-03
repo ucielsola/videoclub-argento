@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Badge, Card } from "flowbite-svelte";
 import { Film, Trophy } from "lucide-svelte";
-import { resolvePosterUrl } from "$lib/api-client";
+import { resolvePosterUrl } from "$lib/poster";
 import type { MovieListItem } from "$lib/types";
 
 interface Props {

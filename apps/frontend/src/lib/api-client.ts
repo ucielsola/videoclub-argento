@@ -10,12 +10,6 @@ function baseUrl(): string {
 	);
 }
 
-export function resolvePosterUrl(path: string | null): string | null {
-	if (!path) return null;
-	if (path.startsWith("http")) return path;
-	return `${baseUrl()}${path}`;
-}
-
 interface MoviesParams {
 	search?: string;
 	director?: string;
