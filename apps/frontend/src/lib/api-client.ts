@@ -2,6 +2,8 @@ import { env } from "$env/dynamic/private";
 import { env as pubEnv } from "$env/dynamic/public";
 import type { MovieDetail, MovieListItem } from "$lib/types";
 
+const API_PREFIX = "/api/videoclub-argento";
+
 function baseUrl(): string {
 	return (
 		(typeof window === "undefined"
@@ -38,7 +40,7 @@ function buildQuery(params?: MoviesParams): string {
 
 export const api = {
 	getMovies: (fetch?: typeof globalThis.fetch, params?: MoviesParams) =>
-		get<MovieListItem[]>(`/movies${buildQuery(params)}`, fetch),
+		get<MovieListItem[]>(`${API_PREFIX}/movies${buildQuery(params)}`, fetch),
 	getMovieBySlug: (slug: string, fetch?: typeof globalThis.fetch) =>
-		get<MovieDetail>(`/movies/${slug}`, fetch),
+		get<MovieDetail>(`${API_PREFIX}/movies/${slug}`, fetch),
 };
