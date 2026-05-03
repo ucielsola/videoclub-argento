@@ -1,6 +1,7 @@
 <script lang="ts">
-import { Card } from "flowbite-svelte";
-import { Film } from "lucide-svelte";
+import { Badge, Card } from "flowbite-svelte";
+import { Film, Trophy } from "lucide-svelte";
+import { resolvePosterUrl } from "$lib/api-client";
 import type { MovieListItem } from "$lib/types";
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
 }
 
 let { movie }: Props = $props();
+
+const posterUrl = $derived(resolvePosterUrl(movie.poster_url));
 </script>
 
 <Card
@@ -16,9 +19,9 @@ let { movie }: Props = $props();
     href={`/movies/${movie.slug}`}
 >
     <div class="bg-gray-200 dark:bg-gray-700 relative flex-1 min-h-0">
-        {#if movie.poster_url}
+        {#if posterUrl}
             <img
-                src={movie.poster_url}
+                src={posterUrl}
                 alt={movie.title}
                 class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 loading="lazy"
@@ -29,6 +32,15 @@ let { movie }: Props = $props();
             >
                 <Film class="w-8 h-8" />
             </div>
+        {/if}
+        {#if movie.is_top_100}
+            <Badge
+                color="yellow"
+                class="absolute top-2 left-2 flex items-center gap-1 text-xs"
+            >
+                <Trophy class="w-3 h-3" />
+                Top 100
+            </Badge>
         {/if}
     </div>
 
@@ -46,11 +58,11 @@ let { movie }: Props = $props();
                     {#each directors as director, index}
                         {@const isLast = index === directors.length - 1}
                         <a
-                            href="/directors/{encodeURIComponent(director)}"
+                            href="/directors/{encodeURIComponent(director.trim())}"
                             class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
                             onclick={(e) => e.stopPropagation()}
                         >
-                            {director}{`${isLast ? "" : ", "}`}
+                            {director.trim()}{`${isLast ? "" : ", "}`}
                         </a>
                     {/each}
                 {:else}
@@ -66,5 +78,19 @@ let { movie }: Props = $props();
                 Unknown
             {/if}
         </p>
+        {#if movie.categories.length > 0}
+            <div class="flex flex-wrap gap-1 mt-1.5">
+                {#each movie.categories as category}
+                    <a
+                        href="/categories/{encodeURIComponent(category)}"
+                        onclick={(e) => e.stopPropagation()}
+                    >
+                        <Badge color="indigo" class="text-[10px] px-1.5 py-0">
+                            {category}
+                        </Badge>
+                    </a>
+                {/each}
+            </div>
+        {/if}
     </div>
 </Card>

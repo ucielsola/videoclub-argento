@@ -1,6 +1,6 @@
 import { env } from "$env/dynamic/private";
 import { env as pubEnv } from "$env/dynamic/public";
-import type { MovieListItem, MovieResponse } from "$lib/types";
+import type { MovieDetail, MovieListItem } from "$lib/types";
 
 function baseUrl(): string {
 	return (
@@ -8,6 +8,18 @@ function baseUrl(): string {
 			? env.PRIVATE_API_BASE_URL
 			: pubEnv.PUBLIC_API_BASE_URL) ?? "http://localhost:8000"
 	);
+}
+
+export function resolvePosterUrl(path: string | null): string | null {
+	if (!path) return null;
+	if (path.startsWith("http")) return path;
+	return `${baseUrl()}${path}`;
+}
+
+interface MoviesParams {
+	search?: string;
+	director?: string;
+	categories?: string;
 }
 
 async function get<T>(
@@ -19,14 +31,20 @@ async function get<T>(
 	return res.json();
 }
 
+function buildQuery(params?: MoviesParams): string {
+	if (!params) return "";
+	const parts: string[] = [];
+	if (params.search) parts.push(`search=${encodeURIComponent(params.search)}`);
+	if (params.director)
+		parts.push(`director=${encodeURIComponent(params.director)}`);
+	if (params.categories)
+		parts.push(`categories=${encodeURIComponent(params.categories)}`);
+	return parts.length > 0 ? `?${parts.join("&")}` : "";
+}
+
 export const api = {
-	getMovies: (fetch?: typeof globalThis.fetch) =>
-		get<MovieListItem[]>("/movies", fetch),
-	getMoviesByDirector: (director: string, fetch?: typeof globalThis.fetch) =>
-		get<MovieListItem[]>(
-			`/movies/director/${encodeURIComponent(director)}`,
-			fetch,
-		),
+	getMovies: (fetch?: typeof globalThis.fetch, params?: MoviesParams) =>
+		get<MovieListItem[]>(`/movies${buildQuery(params)}`, fetch),
 	getMovieBySlug: (slug: string, fetch?: typeof globalThis.fetch) =>
-		get<MovieResponse>(`/movies/slug/${slug}`, fetch),
+		get<MovieDetail>(`/movies/${slug}`, fetch),
 };

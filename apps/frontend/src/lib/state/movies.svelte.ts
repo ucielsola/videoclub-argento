@@ -54,7 +54,6 @@ class MoviesStore {
 		if (!this.#fuseInstance) {
 			this.#fuseInstance = new Fuse(this.#list, {
 				keys: [
-					{ name: "search_title", weight: 0.7 },
 					{ name: "title", weight: 0.7 },
 					{ name: "director", weight: 0.3 },
 					{ name: "year", weight: 0.5 },

@@ -1,43 +1,95 @@
 export type SortMode = "title" | "year" | "director";
 export type SortDirection = "asc" | "desc";
 
-export type EnrichmentStatus = "PENDING" | "PROCESSING" | "COMPLETE" | "FAILED";
-
 export interface MovieListItem {
-	id: number;
+	hash: string;
+	slug: string;
 	title: string;
-	year?: number | null;
-	poster_url?: string | null;
-	search_title?: string | null;
-	slug?: string | null;
-	director?: string | null;
-	rating?: number | null;
-	watch_link?: string | null;
+	year: number;
+	director: string;
+	poster_url: string;
+	rating: number | null;
+	watch_link: string | null;
+	is_top_100: boolean;
+	categories: string[];
 }
 
-export interface MovieResponse {
-	id: number;
-	title: string;
-	director?: string | null;
-	year?: number | null;
-	official_media?: string | null;
-	watch_link?: string | null;
-	tmdb_id?: number | null;
-	original_title?: string | null;
-	poster_url?: string | null;
-	backdrop_url?: string | null;
-	tmdb_synopsis?: string | null;
-	rating?: number | null;
-	vote_count?: number | null;
-	runtime?: number | null;
-	genres?: string | null;
-	imdb_rating?: number | null;
-	imdb_votes?: number | null;
-	wiki_summary?: string | null;
-	wikipedia_url?: string | null;
-	search_title?: string | null;
-	slug?: string | null;
-	enrichment_status?: EnrichmentStatus | null;
-	created_at?: string | null;
-	updated_at?: string | null;
+export interface MovieDetail extends MovieListItem {
+	backdrop_url: string | null;
+	official_media: string | null;
+	synopsis: string | null;
+	runtime: number | null;
+	genres: string[];
+	cast: string[];
+	imdb_rating: number | null;
+	imdb_votes: number | null;
+	color_type: string | null;
+	sound_type: string | null;
+	still_urls: string[];
+	enrichment: Enrichment[];
+}
+
+export type Enrichment =
+	| TmdbEnrichment
+	| OmdbEnrichment
+	| WikipediaEnrichment
+	| CinenacionalEnrichment;
+
+export interface TmdbEnrichment {
+	source: "tmdb";
+	data: {
+		genres: string[];
+		rating: number;
+		runtime: number;
+		tmdb_id: number;
+		synopsis: string;
+		vote_count: number;
+		backdrop_url: string;
+		original_title: string;
+		primary_poster: string;
+		alternate_posters: string[] | null;
+	};
+}
+
+export interface OmdbEnrichment {
+	source: "omdb";
+	data: {
+		genres: string[];
+		imdb_id: string;
+		runtime: number | null;
+		synopsis: string | null;
+		imdb_votes: string | number | null;
+		imdb_rating: string | number | null;
+	};
+}
+
+export interface WikipediaEnrichment {
+	source: "wikipedia";
+	data: {
+		synopsis: string;
+		page_title: string;
+		wikipedia_url: string;
+	};
+}
+
+export interface CinenacionalEnrichment {
+	source: "cinenacional";
+	data: {
+		cast: string[];
+		rating: string;
+		writer: string;
+		imdb_id: string;
+		tmdb_id: number;
+		director: string;
+		duration: number;
+		synopsis: string;
+		movie_url: string;
+		color_type: string;
+		sound_type: string;
+		still_urls: string[];
+		release_date: string;
+		primary_poster: string;
+		cinenacional_id: number;
+		alternate_posters: string[] | null;
+	};
 }
