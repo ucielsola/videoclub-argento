@@ -11,6 +11,7 @@ import {
 	Users,
 } from "lucide-svelte";
 import SynopsisTabs from "$lib/components/SynopsisTabs.svelte";
+import Tooltip from "$lib/components/Tooltip.svelte";
 import { resolvePosterUrl } from "$lib/poster";
 import type { MovieDetail } from "$lib/types";
 
@@ -171,14 +172,15 @@ const stillUrls = $derived(
                         </h2>
                         <div class="flex flex-wrap gap-2">
                             {#each cast as actor}
-                                <a
-                                    href="https://cinenacional.com/persona/{actor.toLowerCase().replace(/\s+/g, '-')}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    title="Ver en Cinenacional"
-                                >
-                                    <Badge color="gray">{actor}</Badge>
-                                </a>
+                                <Tooltip text="Ver en Cinenacional">
+                                    <a
+                                        href="https://cinenacional.com/persona/{actor.toLowerCase().replace(/\s+/g, '-')}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <Badge color="gray">{actor}</Badge>
+                                    </a>
+                                </Tooltip>
                             {/each}
                         </div>
                     </div>
