@@ -1,15 +1,10 @@
-import { env } from "$env/dynamic/private";
-import { env as pubEnv } from "$env/dynamic/public";
+import { env } from "$env/dynamic/public";
 import type { MovieDetail, MovieListItem } from "$lib/types";
 
 const API_PREFIX = "/api/videoclub-argento";
 
 function baseUrl(): string {
-	return (
-		(typeof window === "undefined"
-			? env.PRIVATE_API_BASE_URL
-			: pubEnv.PUBLIC_API_BASE_URL) ?? "http://localhost:8000"
-	);
+	return env.PUBLIC_UCIEL_API ?? "http://localhost:8000";
 }
 
 interface MoviesParams {
