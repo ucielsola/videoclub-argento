@@ -89,12 +89,13 @@ const visibleItems = $derived.by(() => {
 const offsetY = $derived(startRow * rowHeight);
 
 function handleContainerScroll(e: Event) {
-	scrollTop = (e.currentTarget as HTMLElement).scrollTop;
+	scrollTop = Math.round((e.currentTarget as HTMLElement).scrollTop);
 }
 
 function recalcTop() {
 	if (!containerRef) return;
-	containerTop = containerRef.offsetTop;
+	const rect = containerRef.getBoundingClientRect();
+	containerTop = rect.top + window.scrollY;
 }
 
 function scheduleWindowUpdate() {
@@ -102,7 +103,7 @@ function scheduleWindowUpdate() {
 	rafId = requestAnimationFrame(() => {
 		if (!containerRef) return;
 		const rect = containerRef.getBoundingClientRect();
-		scrollTop = Math.max(0, -rect.top);
+		scrollTop = Math.round(Math.max(0, -rect.top));
 		containerHeight = Math.max(0, window.innerHeight - Math.max(0, rect.top));
 	});
 }
@@ -167,11 +168,10 @@ $effect(() => {
                         gap: {gap}px;
                     "
             >
-                {#each visibleItems as { item, index } (index)}
+		{#each visibleItems as { item, index } (index)}
                     <div
                         class="w-full"
                         style="height: {itemHeight}px; content-visibility: auto; contain-intrinsic-size: 0 {itemHeight}px;"
-                        transition:fade
                     >
                         {@render row({ item, index })}
                     </div>
