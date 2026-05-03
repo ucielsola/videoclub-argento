@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Badge, Button } from "flowbite-svelte";
+import { Badge, Button, Tooltip } from "flowbite-svelte";
 import {
 	Clock,
 	ExternalLink,
@@ -172,12 +172,14 @@ const stillUrls = $derived(
                         <div class="flex flex-wrap gap-2">
                             {#each cast as actor}
                                 <a
+                                    id="cast-{actor}"
                                     href="https://cinenacional.com/persona/{actor.toLowerCase().replace(/\s+/g, '-')}"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     <Badge color="gray">{actor}</Badge>
                                 </a>
+                                <Tooltip triggeredBy="#cast-{actor}" placement="top">Ver en Cinenacional</Tooltip>
                             {/each}
                         </div>
                     </div>
