@@ -159,7 +159,7 @@ const stillUrls = $derived(
                     </div>
                 {/if}
 
-                <SynopsisTabs synopsis={movie.synopsis} {enrichment} />
+                <SynopsisTabs {enrichment} />
 
                 {#if cast.length > 0}
                     <div class="mb-6">

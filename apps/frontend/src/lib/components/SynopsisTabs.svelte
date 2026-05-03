@@ -7,11 +7,10 @@ interface SynopsisSource {
 }
 
 interface Props {
-	synopsis: string | null;
 	enrichment: Enrichment[];
 }
 
-let { synopsis, enrichment }: Props = $props();
+let { enrichment }: Props = $props();
 
 const sources = $derived.by(() => {
 	const result: SynopsisSource[] = [];
@@ -30,36 +29,29 @@ const sources = $derived.by(() => {
 	return result;
 });
 
-const hasMultipleSources = $derived(sources.length > 1);
-
 let activeTab = $state<number>(0);
 </script>
 
-{#if synopsis || sources.length > 0}
+{#if sources.length > 0}
     <div class="mb-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             Sinopsis
+            {#if sources.length === 1}
+                <span class="text-sm font-normal text-gray-400">({sources[0].label})</span>
+            {/if}
         </h2>
 
-        {#if hasMultipleSources}
+        {#if sources.length > 1}
             <div
                 class="flex border-b border-gray-200 dark:border-gray-700 mb-3 overflow-x-auto"
             >
-                <button
-                    class="px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors {activeTab === 0
-                        ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}"
-                    onclick={() => (activeTab = 0)}
-                >
-                    Sinopsis
-                </button>
                 {#each sources as source, i}
                     <button
                         class="px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
-                        i + 1
+                        i
                             ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}"
-                        onclick={() => (activeTab = i + 1)}
+                        onclick={() => (activeTab = i)}
                     >
                         {source.label}
                     </button>
@@ -67,13 +59,11 @@ let activeTab = $state<number>(0);
             </div>
 
             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                {activeTab === 0
-                    ? synopsis || sources[0].synopsis
-                    : sources[activeTab - 1].synopsis}
+                {sources[activeTab].synopsis}
             </p>
         {:else}
             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                {synopsis || sources[0]?.synopsis || ""}
+                {sources[0].synopsis}
             </p>
         {/if}
     </div>
