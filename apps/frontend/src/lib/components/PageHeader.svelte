@@ -15,6 +15,15 @@ interface Props {
 }
 
 let { title = "Video Club Argento", actionsSlot }: Props = $props();
+
+let hasActiveFilters = $derived(
+	movies.searchQuery !== "" ||
+		movies.activeFilter !== "all" ||
+		movies.sortBy !== "year" ||
+		movies.sortDirection !== "desc" ||
+		movies.watchlistFilter !== null ||
+		movies.categoryFilter !== null,
+);
 </script>
 
 <div class="h-56 md:h-52"></div>
@@ -76,19 +85,27 @@ let { title = "Video Club Argento", actionsSlot }: Props = $props();
                 </span>
             </div>
 
-            <div
-                class="order-1 md:order-2 w-full md:w-auto flex md:flex-2 justify-between md:justify-center items-center gap-2 md:gap-3"
-            >
-                <div
-                    class="overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                >
-                    <FilterPills />
-                </div>
+			<div
+				class="order-1 md:order-2 w-full md:w-auto flex md:flex-2 justify-between md:justify-center items-center gap-2 md:gap-3"
+			>
+				<div
+					class="overflow-x-auto whitespace-nowrap [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+				>
+					<FilterPills />
+				</div>
 
-                <div class="shrink-0 md:flex-1 flex justify-end">
-                    <SortControls />
-                </div>
-            </div>
+				<div class="shrink-0 md:flex-1 flex items-center gap-2 justify-end">
+					{#if hasActiveFilters}
+						<button
+							onclick={() => movies.resetFilters()}
+							class="text-xs px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+						>
+							Quitar todos los filtros
+						</button>
+					{/if}
+					<SortControls />
+				</div>
+			</div>
         </div>
     </div>
 </header>

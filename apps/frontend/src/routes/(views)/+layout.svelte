@@ -1,5 +1,4 @@
 <script lang="ts">
-import Footer from "$lib/components/Footer.svelte";
 import Logo from "$lib/components/Logo.svelte";
 import ThemeToggle from "$lib/components/ThemeToggle.svelte";
 
@@ -29,7 +28,3 @@ let { children } = $props();
 </div>
 
 <div class="pt-24 pb-20">{@render children()}</div>
-
-<Footer>
-	<p>Built with ❤️ for Argentine cinema</p>
-</Footer>

@@ -1,6 +1,5 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import Footer from "$lib/components/Footer.svelte";
 import MovieGrid from "$lib/components/MovieGrid.svelte";
 import PageHeader from "$lib/components/PageHeader.svelte";
 import { movies, watchlist } from "$lib/state";
@@ -41,9 +40,3 @@ const filteredMovies = $derived(
 		<MovieGrid list={filteredMovies} />
 	{/if}
 </div>
-
-<Footer>
-	{#snippet children()}
-		<p>Video Club Argento &copy; {new Date().getFullYear()}</p>
-	{/snippet}
-</Footer>

@@ -2,8 +2,12 @@
 import { Search, X } from "lucide-svelte";
 import { movies } from "$lib/state";
 
-let inputValue = $state("");
+let inputValue = $state(movies.searchQuery);
 let debounceTimer: ReturnType<typeof setTimeout> | undefined = $state();
+
+$effect(() => {
+	inputValue = movies.searchQuery;
+});
 
 function handleInput(e: Event) {
 	const value = (e.target as HTMLInputElement).value;

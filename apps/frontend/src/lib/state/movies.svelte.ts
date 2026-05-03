@@ -162,6 +162,15 @@ class MoviesStore {
 	setFilter(filter: FilterMode): void {
 		this.#activeFilter = filter ?? DEFAULT_FILTER;
 	}
+
+	resetFilters(): void {
+		this.#searchQuery = "";
+		this.#activeFilter = "all";
+		this.#sortBy = "year";
+		this.#sortDirection = "desc";
+		this.#watchlistFilter = null;
+		this.#categoryFilter = null;
+	}
 }
 
 export const movies = new MoviesStore();

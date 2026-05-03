@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Alert } from "flowbite-svelte";
 import { movies } from "$lib/state";
 import type { MovieListItem } from "$lib/types";
 import MovieCard from "./MovieCard.svelte";
@@ -37,10 +36,14 @@ let filteredList = $derived(list ?? movies.filteredList);
 </VirtualList>
 
 {#if filteredList.length === 0 && movies.list.length > 0}
-    <div class="mt-8">
-        <Alert color="yellow">
-            <span class="font-medium">No se encontraron películas.</span>
-            <span>Intenta con otro término de búsqueda.</span>
-        </Alert>
+    <div class="mt-8 flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400">
+        <span class="text-lg">No se encontraron películas</span>
+        <span class="text-sm">Intenta con otro término de búsqueda</span>
+        <button
+            onclick={() => movies.resetFilters()}
+            class="mt-2 text-sm px-4 py-1.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        >
+            Quitar todos los filtros
+        </button>
     </div>
 {/if}
