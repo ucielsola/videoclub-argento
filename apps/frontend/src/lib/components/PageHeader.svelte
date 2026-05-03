@@ -1,13 +1,13 @@
 <script lang="ts">
-import { Badge } from "flowbite-svelte";
 import type { Snippet } from "svelte";
-import { movies, watchlist } from "$lib/state";
+import { movies } from "$lib/state";
 import CategoryChips from "./CategoryChips.svelte";
 import FilterPills from "./FilterPills.svelte";
 import HeaderSearch from "./HeaderSearch.svelte";
 import Logo from "./Logo.svelte";
 import SortControls from "./SortControls.svelte";
 import ThemeToggle from "./ThemeToggle.svelte";
+import WatchlistTabs from "./WatchlistTabs.svelte";
 
 interface Props {
 	title?: string;
@@ -15,10 +15,6 @@ interface Props {
 }
 
 let { title = "Video Club Argento", actionsSlot }: Props = $props();
-
-const watchlistCount = $derived(
-	watchlist.quieroVerList.length + watchlist.yaLaViList.length,
-);
 </script>
 
 <div class="h-56 md:h-52"></div>
@@ -51,17 +47,7 @@ const watchlistCount = $derived(
                 </h1>
             </div>
             <div class="flex items-center gap-2">
-                <a
-                    href="/listas"
-                    class="flex items-center gap-1 px-3 py-1.5 text-xs rounded-full transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                >
-                    Mis listas
-                    {#if watchlistCount > 0}
-                        <Badge color="indigo" class="text-[10px] px-1 py-0">
-                            {watchlistCount}
-                        </Badge>
-                    {/if}
-                </a>
+                <WatchlistTabs />
                 <ThemeToggle />
                 {#if actionsSlot}
                     {@render actionsSlot()}

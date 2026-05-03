@@ -10,6 +10,7 @@ import {
 	Trophy,
 	Users,
 } from "lucide-svelte";
+import NoInfoAvailable from "$lib/components/NoInfoAvailable.svelte";
 import SynopsisTabs from "$lib/components/SynopsisTabs.svelte";
 import Tooltip from "$lib/components/Tooltip.svelte";
 import { resolvePosterUrl } from "$lib/poster";
@@ -26,6 +27,9 @@ const genres = $derived(movie?.genres ?? []);
 const categories = $derived(movie?.categories ?? []);
 const cast = $derived(movie?.cast ?? []);
 const enrichment = $derived(movie?.enrichment ?? []);
+const hasOnlyWikipedia = $derived(
+	enrichment.length > 0 && enrichment.every((e) => e.source === "wikipedia"),
+);
 
 const posterUrl = $derived(movie ? resolvePosterUrl(movie.poster_url) : null);
 const backdropUrl = $derived(
@@ -160,7 +164,11 @@ const stillUrls = $derived(
                     </div>
                 {/if}
 
-                <SynopsisTabs {enrichment} />
+                {#if hasOnlyWikipedia}
+                    <NoInfoAvailable />
+                {:else}
+                    <SynopsisTabs {enrichment} />
+                {/if}
 
                 {#if cast.length > 0}
                     <div class="mb-6">
