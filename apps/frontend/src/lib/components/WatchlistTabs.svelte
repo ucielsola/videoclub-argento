@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import { watchlist } from "$lib/state";
+import type { Snippet } from "svelte";
+import { watchlist } from "$lib/state";
 
-	interface Props {
-		activeTab: "quiero" | "visto";
-		onchange?: (tab: "quiero" | "visto") => void;
-		children?: Snippet<[{ count: number }]>;
-	}
+interface Props {
+	activeTab: "quiero" | "visto";
+	onchange?: (tab: "quiero" | "visto") => void;
+	children?: Snippet<[{ count: number }]>;
+}
 
-	let { activeTab, onchange, children }: Props = $props();
+let { activeTab, onchange, children }: Props = $props();
 
-	const quieroCount = $derived(watchlist.quieroVerList.length);
-	const vistoCount = $derived(watchlist.yaLaViList.length);
+const quieroCount = $derived(watchlist.quieroVerList.length);
+const vistoCount = $derived(watchlist.yaLaViList.length);
 </script>
 
 <div class="flex gap-2">

@@ -3,6 +3,7 @@ import { onMount } from "svelte";
 import Footer from "$lib/components/Footer.svelte";
 import MovieGrid from "$lib/components/MovieGrid.svelte";
 import PageHeader from "$lib/components/PageHeader.svelte";
+import WatchlistTabs from "$lib/components/WatchlistTabs.svelte";
 import { movies, watchlist } from "$lib/state";
 import type { MovieListItem } from "$lib/types";
 
@@ -29,20 +30,7 @@ const filteredMovies = $derived(
 
 <PageHeader title="Mis Listas">
 	{#snippet actionsSlot()}
-		<div class="flex gap-2">
-			<button
-				onclick={() => (activeTab = "quiero")}
-				class="px-3 py-1.5 text-xs rounded-full transition-colors {activeTab === 'quiero' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}"
-			>
-				Quiero ver ({watchlist.quieroVerList.length})
-			</button>
-			<button
-				onclick={() => (activeTab = "visto")}
-				class="px-3 py-1.5 text-xs rounded-full transition-colors {activeTab === 'visto' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}"
-			>
-				Ya la vi ({watchlist.yaLaViList.length})
-			</button>
-		</div>
+		<WatchlistTabs {activeTab} onchange={(tab) => (activeTab = tab)} />
 	{/snippet}
 </PageHeader>
 
