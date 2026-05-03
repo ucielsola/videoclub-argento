@@ -14,11 +14,12 @@ export function scrollToIndex(index: number, behavior?: ScrollBehavior) {
 interface Props {
 	itemHeight?: number;
 	overscan?: number;
+	list?: MovieListItem[];
 }
 
-let { itemHeight = 280, overscan = 24 }: Props = $props();
+let { itemHeight = 460, overscan = 12, list }: Props = $props();
 
-let filteredList = $derived(movies.filteredList);
+let filteredList = $derived(list ?? movies.filteredList);
 </script>
 
 <VirtualList
