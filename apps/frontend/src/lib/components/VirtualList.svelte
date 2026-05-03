@@ -16,7 +16,8 @@ interface Props {
 let {
 	items,
 	itemHeight,
-	minColWidth = 340,
+	minColWidth = 320,
+	maxCols = 4,
 	gap = 8,
 	overscan = 3,
 	useWindowScroll = false,
@@ -33,7 +34,7 @@ let containerTop = 0;
 let rafId = 0;
 
 const columnsCount = $derived(
-	Math.max(1, Math.floor(containerWidth / minColWidth)),
+	Math.max(1, Math.min(maxCols, Math.floor(containerWidth / minColWidth))),
 );
 
 const rowHeight = $derived(itemHeight + gap);

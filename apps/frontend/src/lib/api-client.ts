@@ -1,5 +1,5 @@
 import { env } from "$env/dynamic/public";
-import type { MovieDetail, MovieListItem } from "$lib/types";
+import type { Category, MovieDetail, MovieListItem } from "$lib/types";
 
 const API_PREFIX = "/api/videoclub-argento";
 
@@ -43,4 +43,11 @@ export const api = {
 	},
 	getMovieBySlug: (slug: string, fetch?: typeof globalThis.fetch) =>
 		get<MovieDetail>(`${API_PREFIX}/movies/${slug}`, fetch),
+	getCategories: async (fetch?: typeof globalThis.fetch) => {
+		const res = await get<{ categories: Category[]; total: number }>(
+			`${API_PREFIX}/categories`,
+			fetch,
+		);
+		return res.categories;
+	},
 };
