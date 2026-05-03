@@ -14,6 +14,7 @@ class MoviesStore {
 	#sortBy = $state<SortMode>("year");
 	#sortDirection = $state<SortDirection>("desc");
 	#watchlistFilter = $state<WatchlistFilter>(null);
+	#categoryFilter = $state<string | null>(null);
 
 	get list(): MovieListItem[] {
 		return this.#list;
@@ -51,6 +52,13 @@ class MoviesStore {
 	}
 	set watchlistFilter(v: WatchlistFilter) {
 		this.#watchlistFilter = v;
+	}
+
+	get categoryFilter(): string | null {
+		return this.#categoryFilter;
+	}
+	set categoryFilter(v: string | null) {
+		this.#categoryFilter = v;
 	}
 
 	initialize(list: MovieListItem[]): void {
@@ -137,6 +145,11 @@ class MoviesStore {
 		} else if (this.#watchlistFilter === "visto") {
 			const slugs = watchlist.yaLaViList;
 			results = results.filter((m) => slugs.includes(m.slug));
+		}
+
+		if (this.#categoryFilter) {
+			const cat = this.#categoryFilter;
+			results = results.filter((m) => (m.categories ?? []).includes(cat));
 		}
 
 		return results;
