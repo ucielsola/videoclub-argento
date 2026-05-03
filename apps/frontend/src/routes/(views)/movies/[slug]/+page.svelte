@@ -171,7 +171,13 @@ const stillUrls = $derived(
                         </h2>
                         <div class="flex flex-wrap gap-2">
                             {#each cast as actor}
-                                <Badge color="gray">{actor}</Badge>
+                                <a
+                                    href="https://cinenacional.com/persona/{actor.toLowerCase().replace(/\s+/g, '-')}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <Badge color="gray">{actor}</Badge>
+                                </a>
                             {/each}
                         </div>
                     </div>
