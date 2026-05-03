@@ -78,9 +78,9 @@ const posterUrl = $derived(resolvePosterUrl(movie.poster_url));
                 Unknown
             {/if}
         </p>
-        {#if movie.categories.length > 0}
+        {#if (movie.categories ?? []).length > 0}
             <div class="flex flex-wrap gap-1 mt-1.5">
-                {#each movie.categories as category}
+                {#each (movie.categories ?? []) as category}
                     <a
                         href="/categories/{encodeURIComponent(category)}"
                         onclick={(e) => e.stopPropagation()}

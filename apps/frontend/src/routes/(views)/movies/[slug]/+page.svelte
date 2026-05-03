@@ -21,6 +21,11 @@ interface Props {
 let { data }: Props = $props();
 let movie = $derived(data.movie);
 
+const genres = $derived(movie?.genres ?? []);
+const categories = $derived(movie?.categories ?? []);
+const cast = $derived(movie?.cast ?? []);
+const enrichment = $derived(movie?.enrichment ?? []);
+
 const posterUrl = $derived(movie ? resolvePosterUrl(movie.poster_url) : null);
 const backdropUrl = $derived(
 	movie ? resolvePosterUrl(movie.backdrop_url) : null,
@@ -136,17 +141,17 @@ const stillUrls = $derived(
                     {/if}
                 </div>
 
-                {#if movie.genres.length > 0}
+                {#if genres.length > 0}
                     <div class="flex flex-wrap gap-2 mb-4">
-                        {#each movie.genres as genre}
+                        {#each genres as genre}
                             <Badge color="gray">{genre}</Badge>
                         {/each}
                     </div>
                 {/if}
 
-                {#if movie.categories.length > 0}
+                {#if categories.length > 0}
                     <div class="flex flex-wrap gap-1.5 mb-6">
-                        {#each movie.categories as category}
+                        {#each categories as category}
                             <a href="/categories/{encodeURIComponent(category)}">
                                 <Badge color="indigo" class="text-xs">{category}</Badge>
                             </a>
@@ -154,9 +159,9 @@ const stillUrls = $derived(
                     </div>
                 {/if}
 
-                <SynopsisTabs synopsis={movie.synopsis} enrichment={movie.enrichment} />
+                <SynopsisTabs synopsis={movie.synopsis} {enrichment} />
 
-                {#if movie.cast.length > 0}
+                {#if cast.length > 0}
                     <div class="mb-6">
                         <h2
                             class="text-lg font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2"
@@ -165,7 +170,7 @@ const stillUrls = $derived(
                             Reparto
                         </h2>
                         <div class="flex flex-wrap gap-2">
-                            {#each movie.cast as actor}
+                            {#each cast as actor}
                                 <Badge color="gray">{actor}</Badge>
                             {/each}
                         </div>
