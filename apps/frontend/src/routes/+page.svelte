@@ -3,27 +3,17 @@ import { onMount } from "svelte";
 import Footer from "$lib/components/Footer.svelte";
 import MovieGrid from "$lib/components/MovieGrid.svelte";
 import PageHeader from "$lib/components/PageHeader.svelte";
-import { movies } from "$lib/state";
-import type { MovieListItem } from "$lib/types";
+import { categories, movies } from "$lib/state";
+import type { Category, MovieListItem } from "$lib/types";
 
 interface Props {
-	data: { movies: MovieListItem[] };
+	data: { movies: MovieListItem[]; categories: Category[] };
 }
 let { data }: Props = $props();
 
 onMount(() => {
-	console.log(
-		"[+page.svelte] data.movies:",
-		data.movies?.length,
-		data.movies?.slice(0, 2),
-	);
 	movies.initialize(data.movies);
-	console.log(
-		"[+page.svelte] store.list:",
-		movies.list.length,
-		"filteredList:",
-		movies.filteredList.length,
-	);
+	categories.initialize(data.categories);
 });
 </script>
 
