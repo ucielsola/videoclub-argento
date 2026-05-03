@@ -170,16 +170,16 @@ const stillUrls = $derived(
                             Reparto
                         </h2>
                         <div class="flex flex-wrap gap-2">
-                            {#each cast as actor}
+                            {#each cast as actor, i}
                                 <a
-                                    id="cast-{actor}"
+                                    id="cast-{i}"
                                     href="https://cinenacional.com/persona/{actor.toLowerCase().replace(/\s+/g, '-')}"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     <Badge color="gray">{actor}</Badge>
                                 </a>
-                                <Tooltip triggeredBy="#cast-{actor}" placement="top">Ver en Cinenacional</Tooltip>
+                                <Tooltip triggeredBy="#cast-{i}" placement="top">Ver en Cinenacional</Tooltip>
                             {/each}
                         </div>
                     </div>
